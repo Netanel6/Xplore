@@ -6,25 +6,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.netanel.xplore.R
-import com.netanel.xplore.utils.Logger
+import com.netanel.xplore.auth.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
  * Created by netanelamar on 01/11/2024.
  * NetanelCA2@gmail.com
  */
-
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val auth: FirebaseAuth
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     var phoneNumber = mutableStateOf("")
@@ -32,35 +27,30 @@ class AuthViewModel @Inject constructor(
     var verificationInProgress = mutableStateOf(false)
     var verificationId = mutableStateOf<String?>(null)
     val snackbarHostState = SnackbarHostState()
+    var authState = mutableStateOf<AuthState>(AuthState.Idle)
+        private set
 
     fun startPhoneNumberVerification(context: Context) {
-        verificationInProgress.value = true
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(context.getString(R.string.israel_country_code).plus(phoneNumber.value))
-            .setTimeout(60L, TimeUnit.SECONDS)
-            .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                    Logger.info("PhoneAuth", "Verification completed.")
+        authState.value = AuthState.Loading
+        viewModelScope.launch {
+            try {
+                val id = authRepository.startPhoneNumberVerification(
+                    context.getString(R.string.israel_country_code) + phoneNumber.value
+                )
+                authState.value = AuthState.VerificationCompleted(id)
+                verificationId.value = id
+            } catch (e: FirebaseException) {
+                val errorMessage = if (e.message?.contains("reCAPTCHA") == true) {
+                    "reCAPTCHA failed"
+                } else {
+                    context.getString(R.string.phone_num_incorrect)
                 }
-
-                override fun onVerificationFailed(e: FirebaseException) {
-                    Logger.info("PhoneAuth", "Verification failed.\n$e")
-                    verificationInProgress.value = false
-                    viewModelScope.launch {
-                        snackbarHostState.showSnackbar(context.getString(R.string.phone_num_incorrect))
-                    }
+                authState.value = AuthState.Error(errorMessage)
+                viewModelScope.launch {
+                    snackbarHostState.showSnackbar(errorMessage)
                 }
-
-                override fun onCodeSent(
-                    verificationId: String,
-                    token: PhoneAuthProvider.ForceResendingToken
-                ) {
-                    Logger.info("PhoneAuth", "Code sent: $verificationId")
-                    this@AuthViewModel.verificationId.value = verificationId
-                }
-            })
-            .build()
-        PhoneAuthProvider.verifyPhoneNumber(options)
+            }
+        }
     }
 
     fun onSignInButtonClicked(context: Context) {
@@ -68,28 +58,35 @@ class AuthViewModel @Inject constructor(
             signInWithPhoneAuthCredential(context)
         } else {
             viewModelScope.launch {
-                snackbarHostState.showSnackbar(context.getString(R.string.otp_incorrect))
+                authState.value = AuthState.Error(context.getString(R.string.otp_incorrect))
             }
         }
     }
 
-    fun signInWithPhoneAuthCredential(context: Context) {
+    private fun signInWithPhoneAuthCredential(context: Context) {
         val credential = verificationId.value?.let {
             PhoneAuthProvider.getCredential(it, verificationCode.value)
         }
 
         credential?.let {
-            auth.signInWithCredential(it)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Logger.info("PhoneAuth", "Sign-in successful.")
-                    } else {
-                        Logger.info("PhoneAuth", "Sign-in failed.\n${task.exception}")
-                        viewModelScope.launch {
-                            snackbarHostState.showSnackbar(context.getString(R.string.otp_incorrect))
-                        }
-                    }
+            viewModelScope.launch {
+                val success = authRepository.signInWithPhoneAuthCredential(it)
+                if (success) {
+                    authState.value = AuthState.SignInSuccess
+                } else {
+                    authState.value = AuthState.Error(context.getString(R.string.otp_incorrect))
+                    snackbarHostState.showSnackbar(context.getString(R.string.otp_incorrect))
                 }
+            }
         }
     }
+
+    sealed class AuthState {
+        data object Idle : AuthState()
+        data object Loading : AuthState()
+        data class VerificationCompleted(val verificationId: String) : AuthState()
+        data object SignInSuccess : AuthState()
+        data class Error(val message: String) : AuthState()
+    }
 }
+

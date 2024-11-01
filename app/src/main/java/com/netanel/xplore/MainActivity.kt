@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val configuration = Configuration(resources.configuration)
-        configuration.setLayoutDirection(Locale("he"))  // Hebrew as an example
+        configuration.setLayoutDirection(Locale(getString(R.string.he_lang)))
         resources.updateConfiguration(configuration, resources.displayMetrics)
 
         enableEdgeToEdge()
@@ -54,7 +55,7 @@ fun MainScreen() {
 @Composable
 fun MainTopAppBar() {
     TopAppBar(
-        title = { Text("Main Screen") },
-        navigationIcon = { Icon(Icons.Default.Menu, contentDescription = "Menu Icon") }
+        title = { Text("לורם איפסום") },
+        navigationIcon = { Icon(Icons.Default.Build, contentDescription = "Menu Icon") }
     )
 }
