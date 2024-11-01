@@ -12,7 +12,20 @@
           "package_name": "com.netanel.xplore"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "155891417073-62o4lhismbc413bvt8lnq8jjt47rsnbb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.netanel.xplore",
+            "certificate_hash": "db7ce1276fa0400290983b8ef750a72dec669481"
+          }
+        },
+        {
+          "client_id": "155891417073-3ej2096123bojnn9jhng5fs22dnpn8ou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDzBOLIqoSStFd6y7TkB9BAQZJBX4zuOd4"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "155891417073-3ej2096123bojnn9jhng5fs22dnpn8ou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

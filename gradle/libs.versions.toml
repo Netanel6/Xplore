@@ -17,6 +17,7 @@ firebaseBom = "33.5.1"
 googleServicesPlugin = "4.4.2"
 crashlyticsPlugin = "3.0.2"
 playServicesAuth = "21.2.0"
+appcompat = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,7 @@ firebaseAnalytics = { module = "com.google.firebase:firebase-analytics" }
 firebaseCrashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebaseAuth = { module = "com.google.firebase:firebase-auth" }
 playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
