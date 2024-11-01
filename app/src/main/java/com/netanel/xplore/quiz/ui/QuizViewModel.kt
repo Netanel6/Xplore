@@ -1,10 +1,10 @@
-package com.netanel.xplore.temp.ui
+package com.netanel.xplore.quiz.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import com.netanel.xplore.temp.model.Question
-import com.netanel.xplore.temp.repository.QuizRepository
+import com.netanel.xplore.quiz.model.Question
+import com.netanel.xplore.quiz.repository.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
