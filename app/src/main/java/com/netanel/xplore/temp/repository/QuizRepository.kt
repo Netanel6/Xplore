@@ -8,7 +8,8 @@ import kotlinx.serialization.json.Json
 class QuizRepository(private val context: Context) {
 
     fun getQuestions(): List<Question> {
-        val jsonString = context.assets.open("questions.json").bufferedReader().use { it.readText() }
+        //questions.json
+        val jsonString = context.assets.open("test_questions.json").bufferedReader().use { it.readText() }
         return Json { ignoreUnknownKeys = true }.decodeFromString(jsonString)
     }
 }

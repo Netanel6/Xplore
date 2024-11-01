@@ -1,7 +1,10 @@
 package com.netanel.xplore
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
+import android.os.LocaleList
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,9 +15,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,11 +34,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.core.text.TextUtilsCompat
+import androidx.core.view.ViewCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.firebase.auth.FirebaseAuth
+import com.netanel.xplore.MainActivity.Companion.firebaseAuth
+import com.netanel.xplore.auth.ui.AuthScreen
 
 import com.netanel.xplore.temp.model.Question
 import com.netanel.xplore.temp.repository.QuizRepository
@@ -38,24 +51,53 @@ import com.netanel.xplore.temp.ui.QuizViewModel
 import com.netanel.xplore.ui.theme.XploreTheme
 import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    companion object {
+        val firebaseAuth = FirebaseAuth.getInstance()
+    }
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val configuration = Configuration(resources.configuration)
+        configuration.setLayoutDirection(Locale("he"))  // Hebrew as an example
+        resources.updateConfiguration(configuration, resources.displayMetrics)
+
         enableEdgeToEdge()
         setContent {
             XploreTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {
-                    QuizScreen()
-                }
+                MainScreen()
             }
         }
     }
 }
 
+//Main Container
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun MainScreen() {
+    Scaffold(
+        topBar = { MainTopAppBar() },
+    ) {
+        AuthScreen(auth = firebaseAuth)
+//        QuizScreen()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainTopAppBar() {
+    TopAppBar(
+        title = { Text("Main Screen") },
+        navigationIcon = { Icon(Icons.Default.Menu, contentDescription = "Menu Icon") }
+    )
+}
+
+
+//Quiz Screen
 @Composable
 fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
     val questions by viewModel.questions.collectAsState()
