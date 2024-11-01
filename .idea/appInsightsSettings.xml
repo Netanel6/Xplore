@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.netanel.xplore" />
+                  <option name="mobileSdkAppId" value="1:155891417073:android:5ca6520ffede94d97a4e50" />
+                  <option name="projectId" value="xplore-bffff" />
+                  <option name="projectNumber" value="155891417073" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

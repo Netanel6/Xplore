@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "155891417073",
+    "project_id": "xplore-bffff",
+    "storage_bucket": "xplore-bffff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155891417073:android:5ca6520ffede94d97a4e50",
+        "android_client_info": {
+          "package_name": "com.netanel.xplore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzBOLIqoSStFd6y7TkB9BAQZJBX4zuOd4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

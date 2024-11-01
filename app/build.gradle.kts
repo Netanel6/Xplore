@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.hilt.android)
     id("kotlin-kapt")
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebaseCrashlytics)
 }
 
 android {
@@ -76,4 +78,11 @@ dependencies {
     implementation(libs.glide)
     kapt(libs.glide.compiler)
 
+
+    // Firebase
+    implementation(platform(libs.firebaseBom))
+    implementation(libs.firebaseAnalytics)
+    implementation(libs.firebaseCrashlytics)
+    implementation(libs.firebaseAuth)
+    implementation(libs.playServicesAuth)
 }
