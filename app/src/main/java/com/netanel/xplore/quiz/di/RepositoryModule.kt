@@ -1,6 +1,6 @@
-package com.netanel.xplore.temp.di
+package com.netanel.xplore.quiz.di
 import android.content.Context
-import com.netanel.xplore.temp.repository.QuizRepository
+import com.netanel.xplore.quiz.repository.QuizRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

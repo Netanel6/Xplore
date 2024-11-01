@@ -1,4 +1,4 @@
-package com.netanel.xplore.temp.model
+package com.netanel.xplore.quiz.model
 
 import kotlinx.serialization.Serializable
 

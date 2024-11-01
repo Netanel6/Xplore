@@ -1,7 +1,7 @@
-package com.netanel.xplore.temp.repository
+package com.netanel.xplore.quiz.repository
 
 import android.content.Context
-import com.netanel.xplore.temp.model.Question
+import com.netanel.xplore.quiz.model.Question
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
