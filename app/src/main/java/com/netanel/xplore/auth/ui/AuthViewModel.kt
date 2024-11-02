@@ -9,6 +9,8 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthProvider
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.repository.AuthRepository
+import com.netanel.xplore.utils.SharedPrefKeys
+import com.netanel.xplore.utils.SharedPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,13 +21,15 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val sharedPreferencesManager: SharedPreferencesManager
 ) : ViewModel() {
 
     var phoneNumber = mutableStateOf("")
-    var verificationCode = mutableStateOf("")
+
+    var name = mutableStateOf("")
     var verificationInProgress = mutableStateOf(false)
-    var verificationId = mutableStateOf<String?>(null)
+    private var verificationId = mutableStateOf<String?>(null)
     val snackbarHostState = SnackbarHostState()
     var authState = mutableStateOf<AuthState>(AuthState.Idle)
         private set
@@ -37,8 +41,10 @@ class AuthViewModel @Inject constructor(
                 val id = authRepository.startPhoneNumberVerification(
                     context.getString(R.string.israel_country_code) + phoneNumber.value
                 )
+                sharedPreferencesManager.saveString(SharedPrefKeys.PHONE_NUMBER, phoneNumber.value)
                 authState.value = AuthState.VerificationCompleted(id)
                 verificationId.value = id
+                verificationInProgress.value = true
             } catch (e: FirebaseException) {
                 val errorMessage = if (e.message?.contains("reCAPTCHA") == true) {
                     "reCAPTCHA failed"
@@ -54,25 +60,22 @@ class AuthViewModel @Inject constructor(
     }
 
     fun onSignInButtonClicked(context: Context) {
-        if (verificationCode.value.isNotBlank()) {
-            signInWithPhoneAuthCredential(context)
-        } else {
-            viewModelScope.launch {
-                authState.value = AuthState.Error(context.getString(R.string.otp_incorrect))
-            }
-        }
+        sharedPreferencesManager.saveString(SharedPrefKeys.USER_NAME, name.value)
+        signInWithPhoneAuthCredential(context)
     }
 
     private fun signInWithPhoneAuthCredential(context: Context) {
         val credential = verificationId.value?.let {
-            PhoneAuthProvider.getCredential(it, verificationCode.value)
+            PhoneAuthProvider.getCredential(it, context.getString(R.string.otp))
         }
 
         credential?.let {
             viewModelScope.launch {
                 val success = authRepository.signInWithPhoneAuthCredential(it)
                 if (success) {
+                    sharedPreferencesManager.saveBoolean(SharedPrefKeys.IS_LOGGED_IN, true)
                     authState.value = AuthState.SignInSuccess
+                    // TODO: Move to next page
                 } else {
                     authState.value = AuthState.Error(context.getString(R.string.otp_incorrect))
                     snackbarHostState.showSnackbar(context.getString(R.string.otp_incorrect))

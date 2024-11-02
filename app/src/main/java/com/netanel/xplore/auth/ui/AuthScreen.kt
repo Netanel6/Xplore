@@ -20,12 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
+import com.netanel.xplore.auth.ui.AuthViewModel.*
 
 @Composable
 fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
     val phoneNumber by viewModel.phoneNumber
-    val verificationCode by viewModel.verificationCode
+    val name by viewModel.name
     val verificationInProgress by viewModel.verificationInProgress
+    val authState by viewModel.authState
     val snackbarHostState = viewModel.snackbarHostState
     val context = LocalContext.current
 
@@ -40,42 +42,69 @@ fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(R.string.to_login_write_phone_number),
-                fontSize = 24.sp,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            if (!verificationInProgress) {
-                OutlinedTextField(
-                    value = phoneNumber,
-                    onValueChange = { viewModel.phoneNumber.value = it },
-                    label = { Text(stringResource(R.string.what_is_your_number)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
-                )
-                Button(onClick = {
-                    viewModel.startPhoneNumberVerification(context)
-                }) {
-                    Text(text = stringResource(R.string.next_step))
+            when (authState) {
+                is AuthState.Loading -> {
+                    Text(
+                        text = stringResource(R.string.loading),
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
                 }
-            } else {
-                OutlinedTextField(
-                    value = verificationCode,
-                    onValueChange = { viewModel.verificationCode.value = it },
-                    label = { Text(stringResource(R.string.write_this_code_to_start)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
-                )
-                Button(onClick = {
-                    viewModel.onSignInButtonClicked(context)
-                }) {
-                    Text(text = stringResource(R.string.shall_we))
+                is AuthState.VerificationCompleted -> {
+                    Text(
+                        text = stringResource(R.string.to_login_write_name),
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { viewModel.name.value = it },
+                        label = { Text(stringResource(R.string.what_is_your_name)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    )
+                    Button(onClick = {
+                        viewModel.onSignInButtonClicked(context)
+                    }) {
+                        Text(text = stringResource(R.string.shall_we))
+                    }
+                }
+                is AuthState.SignInSuccess -> {
+                    // TODO: Move to next page
+                }
+                is AuthState.Error -> {
+                    Text(
+                        text = (authState as AuthState.Error).message,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+                else -> {
+                    if (!verificationInProgress) {
+                        Text(
+                            text = stringResource(R.string.to_login_write_phone_number),
+                            fontSize = 24.sp,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        OutlinedTextField(
+                            value = phoneNumber,
+                            onValueChange = { viewModel.phoneNumber.value = it },
+                            label = { Text(stringResource(R.string.what_is_your_number)) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                        )
+                        Button(onClick = {
+                            viewModel.startPhoneNumberVerification(context)
+                        }) {
+                            Text(text = stringResource(R.string.next_step))
+                        }
+                    }
                 }
             }
         }
     }
 }
+
 
