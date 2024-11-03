@@ -92,7 +92,7 @@ fun QuizQuestion(question: Question, onAnswerSelected: (Boolean) -> Unit) {
 
 @Composable
 fun LottieAnimationScreen(onAnimationEnd: () -> Unit) {
-    // TODO: Add Lottie roatation and randomized
+    // TODO: Add Lottie rotation and randomized
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset("black_cat_2.json"))
     val progress by animateLottieCompositionAsState(
         composition = composition,
