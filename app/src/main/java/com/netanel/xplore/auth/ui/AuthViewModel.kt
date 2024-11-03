@@ -84,6 +84,14 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun resetAuthState() {
+        authState.value = AuthState.Idle
+        phoneNumber.value = ""
+        name.value = ""
+        verificationInProgress.value = false
+    }
+
+
     sealed class AuthState {
         data object Idle : AuthState()
         data object Loading : AuthState()
