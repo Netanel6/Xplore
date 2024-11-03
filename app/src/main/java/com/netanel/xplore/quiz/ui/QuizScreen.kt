@@ -44,7 +44,7 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
     val questions by viewModel.questions.collectAsState()
     var currentQuestionIndex by remember { mutableIntStateOf(0) }
     var showAnimation by remember { mutableStateOf(false) }
-    var animationType by remember { mutableStateOf(false) }
+    var animationType by remember { mutableStateOf(AnimationType.Idle) }
 
     // Track answered questions that should be locked when revisited
     val lockedQuestions = remember { mutableStateListOf<Int>() }
@@ -80,7 +80,7 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
                 if (selectedAnswers[currentQuestionIndex].value != null) {
                     val isCorrect =
                         selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
-                    animationType = isCorrect
+                    animationType = if (isCorrect) AnimationType.Correct else AnimationType.Wrong
 
                     // Show animation only if this question has not been animated before
                     if (currentQuestionIndex !in animatedQuestions) {
@@ -233,8 +233,8 @@ fun QuizQuestion(
 }
 
 @Composable
-fun LottieAnimationScreen(animationType: Boolean, onAnimationEnd: () -> Unit) {
-    val animationFile = if (animationType) "black_cat_2.json" else "black_cat_1.json"
+fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Unit) {
+    val animationFile = if (animationType == AnimationType.Correct) "black_cat_2.json" else "black_cat_1.json"
 
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(animationFile))
     val progress by animateLottieCompositionAsState(
@@ -261,4 +261,10 @@ fun LottieAnimationScreen(animationType: Boolean, onAnimationEnd: () -> Unit) {
             modifier = Modifier.fillMaxSize(0.8f)
         )
     }
+}
+
+enum class AnimationType{
+    Correct,
+    Wrong,
+    Idle
 }

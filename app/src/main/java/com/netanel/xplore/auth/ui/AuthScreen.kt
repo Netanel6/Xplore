@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,11 +75,14 @@ fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
                     // TODO: Move to next page
                 }
                 is AuthState.Error -> {
-                    Text(
+                    LaunchedEffect(Unit) {
+                        viewModel.resetAuthState()
+                    }
+                   /* Text(
                         text = (authState as AuthState.Error).message,
                         fontSize = 20.sp,
                         modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    )*/
                 }
                 else -> {
                     if (!verificationInProgress) {
