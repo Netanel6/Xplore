@@ -19,3 +19,4 @@ gradle/wrapper/gradle-wrapper.properties
 .idea/misc.xml
 .idea/appInsightsSettings.xml
 .idea/runConfigurations.xml
+.idea/inspectionProfiles/Project_Default.xml
