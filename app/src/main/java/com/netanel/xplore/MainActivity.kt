@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.auth.ui.AuthScreen
+import com.netanel.xplore.navigation.NavigationStack
 import com.netanel.xplore.quiz.ui.QuizScreen
 import com.netanel.xplore.ui.theme.XploreTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(viewModel: MainActivityViewModel = hiltViewModel()) {
+fun MainScreen() {
     Scaffold(
         topBar = { MainTopAppBar() },
     ) { paddingValues ->
@@ -55,11 +56,7 @@ fun MainScreen(viewModel: MainActivityViewModel = hiltViewModel()) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (viewModel.isUserLoggedIn()) {
-                QuizScreen()
-            } else {
-                AuthScreen()
-            }
+            NavigationStack()
         }
     }
 }
