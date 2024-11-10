@@ -16,3 +16,7 @@ local.properties
 gradle/wrapper/gradle-wrapper.properties
 .idea/appInsightsSettings.xml
 .kotlin/sessions/kotlin-compiler-16695861552482296589.salive
+.idea/misc.xml
+.idea/appInsightsSettings.xml
+.idea/runConfigurations.xml
+.idea/inspectionProfiles/Project_Default.xml

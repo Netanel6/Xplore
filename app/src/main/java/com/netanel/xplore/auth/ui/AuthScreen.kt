@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +24,7 @@ import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthViewModel.*
 
 @Composable
-fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
+fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
     val phoneNumber by viewModel.phoneNumber
     val name by viewModel.name
     val verificationInProgress by viewModel.verificationInProgress
@@ -71,14 +72,16 @@ fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
                     }
                 }
                 is AuthState.SignInSuccess -> {
-                    // TODO: Move to next page
+                    // Trigger navigation to the next page when SignInSuccess occurs.
+                    LaunchedEffect(Unit) {
+                        onLoginSuccess()
+                    }
                 }
                 is AuthState.Error -> {
-                    Text(
-                        text = (authState as AuthState.Error).message,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    // Reset the AuthState to idle or other required state.
+                    LaunchedEffect(Unit) {
+                        viewModel.resetAuthState()
+                    }
                 }
                 else -> {
                     if (!verificationInProgress) {
@@ -106,5 +109,3 @@ fun AuthScreen(viewModel: AuthViewModel = hiltViewModel()) {
         }
     }
 }
-
-
