@@ -236,7 +236,7 @@ fun QuizQuestion(
 
 @Composable
 fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Unit) {
-    val animationFile = if (animationType == AnimationType.Correct) "black_cat_2.json" else "black_cat_1.json"
+    val animationFile = if (animationType == AnimationType.Correct) "correct.json" else "wrong.json"
 
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(animationFile))
     val progress by animateLottieCompositionAsState(
