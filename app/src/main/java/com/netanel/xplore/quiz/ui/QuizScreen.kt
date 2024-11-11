@@ -59,11 +59,14 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
             animationType = animationType,
             onAnimationEnd = {
                 showAnimation = false
+                if (currentQuestionIndex < questions.size - 1) {
+                    currentQuestionIndex += 1
+                }
             }
         )
     }
 
-    if (currentQuestionIndex < questions.size) {
+    if (!showAnimation && currentQuestionIndex < questions.size) {
         // Check if the current question should be locked based on previous answers
         val isAnswerLocked = lockedQuestions.contains(currentQuestionIndex)
 
@@ -78,23 +81,24 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
             },
             onNextClicked = {
                 if (selectedAnswers[currentQuestionIndex].value != null) {
-                    val isCorrect =
-                        selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
+                    val isCorrect = selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
                     animationType = if (isCorrect) AnimationType.Correct else AnimationType.Wrong
 
                     // Show animation only if this question has not been animated before
                     if (currentQuestionIndex !in animatedQuestions) {
                         showAnimation = true
                         animatedQuestions.add(currentQuestionIndex) // Mark this question as animated
-                    }
 
-                    // Lock answer selection for this question
-                    if (currentQuestionIndex !in lockedQuestions) {
-                        lockedQuestions.add(currentQuestionIndex)
+                        // Lock answer selection for this question
+                        if (currentQuestionIndex !in lockedQuestions) {
+                            lockedQuestions.add(currentQuestionIndex)
+                        }
+                    } else {
+                        // If animation has already been shown, move directly to the next question
+                        if (currentQuestionIndex < questions.size - 1) {
+                            currentQuestionIndex += 1
+                        }
                     }
-
-                    // Move to the next question after handling animation
-                    currentQuestionIndex += 1
                 }
             },
             onPreviousClicked = {
@@ -103,7 +107,7 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
                 }
             }
         )
-    } else {
+    } else if (currentQuestionIndex >= questions.size) {
         // Display end of quiz or summary screen
         Text(
             text = "סיימת את השאלון! גש לקבל סוכריה",
@@ -192,9 +196,7 @@ fun QuizQuestion(
                     shape = MaterialTheme.shapes.medium,
                     elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) Color(
-                            0xFFB2DFDB
-                        ) else Color.White
+                        containerColor = if (isSelected) Color(0xFFB2DFDB) else Color.White
                     )
                 ) {
                     Row(
@@ -263,7 +265,7 @@ fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Un
     }
 }
 
-enum class AnimationType{
+enum class AnimationType {
     Correct,
     Wrong,
     Idle
