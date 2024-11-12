@@ -52,68 +52,97 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
     val animatedQuestions = remember { mutableStateListOf<Int>() }
 
     // Store the selected answers for each question with mutable state wrappers
-    val selectedAnswers = remember { MutableList(questions.size) { mutableStateOf<Int?>(null) } }
+    val selectedAnswers = remember(questions) { MutableList(questions.size) { mutableStateOf<Int?>(null) } }
 
-    if (showAnimation) {
-        LottieAnimationScreen(
-            animationType = animationType,
-            onAnimationEnd = {
-                showAnimation = false
-                if (currentQuestionIndex < questions.size - 1) {
-                    currentQuestionIndex += 1
-                }
-            }
-        )
-    }
-
-    if (!showAnimation && currentQuestionIndex < questions.size) {
-        // Check if the current question should be locked based on previous answers
-        val isAnswerLocked = lockedQuestions.contains(currentQuestionIndex)
-
-        QuizQuestion(
-            question = questions[currentQuestionIndex],
-            currentQuestionNumber = currentQuestionIndex + 1,
-            totalQuestions = questions.size,
-            userSelectedAnswer = selectedAnswers[currentQuestionIndex].value,
-            isAnswerLocked = isAnswerLocked,
-            onAnswerSelected = { selectedIndex ->
-                selectedAnswers[currentQuestionIndex].value = selectedIndex
-            },
-            onNextClicked = {
-                if (selectedAnswers[currentQuestionIndex].value != null) {
-                    val isCorrect = selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
-                    animationType = if (isCorrect) AnimationType.Correct else AnimationType.Wrong
-
-                    // Show animation only if this question has not been animated before
-                    if (currentQuestionIndex !in animatedQuestions) {
-                        showAnimation = true
-                        animatedQuestions.add(currentQuestionIndex) // Mark this question as animated
-
-                        // Lock answer selection for this question
-                        if (currentQuestionIndex !in lockedQuestions) {
-                            lockedQuestions.add(currentQuestionIndex)
-                        }
+    if (questions.isEmpty()) {
+        // Handle empty questions list or loading state
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "שאלות נטענות אנא חכה",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+    } else {
+        if (showAnimation) {
+            LottieAnimationScreen(
+                animationType = animationType,
+                onAnimationEnd = {
+                    showAnimation = false
+                    if (currentQuestionIndex < questions.size - 1) {
+                        // Move to next question after animation, if not the last question
+                        currentQuestionIndex += 1
                     } else {
-                        // If animation has already been shown, move directly to the next question
-                        if (currentQuestionIndex < questions.size - 1) {
-                            currentQuestionIndex += 1
-                        }
+                        // End of quiz reached
+                        currentQuestionIndex = questions.size // Ensures we display the end of quiz text
                     }
                 }
-            },
-            onPreviousClicked = {
-                if (currentQuestionIndex > 0) {
-                    currentQuestionIndex -= 1
+            )
+        } else {
+            if (currentQuestionIndex < questions.size) {
+                // Check if the current question should be locked based on previous answers
+                val isAnswerLocked = lockedQuestions.contains(currentQuestionIndex)
+
+                QuizQuestion(
+                    question = questions[currentQuestionIndex],
+                    currentQuestionNumber = currentQuestionIndex + 1,
+                    totalQuestions = questions.size,
+                    userSelectedAnswer = selectedAnswers[currentQuestionIndex].value,
+                    isAnswerLocked = isAnswerLocked,
+                    onAnswerSelected = { selectedIndex ->
+                        selectedAnswers[currentQuestionIndex].value = selectedIndex
+                    },
+                    onNextClicked = {
+                        if (selectedAnswers[currentQuestionIndex].value != null) {
+                            val isCorrect =
+                                selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
+                            animationType = if (isCorrect) AnimationType.Correct else AnimationType.Wrong
+
+                            // Show animation only if this question has not been animated before
+                            if (currentQuestionIndex !in animatedQuestions) {
+                                showAnimation = true
+                                animatedQuestions.add(currentQuestionIndex) // Mark this question as animated
+
+                                // Lock answer selection for this question
+                                if (currentQuestionIndex !in lockedQuestions) {
+                                    lockedQuestions.add(currentQuestionIndex)
+                                }
+                            } else {
+                                // If animation has already been shown, move directly to the next question
+                                if (currentQuestionIndex < questions.size - 1) {
+                                    currentQuestionIndex += 1
+                                } else {
+                                    // Handle transition to the end of quiz
+                                    currentQuestionIndex = questions.size
+                                }
+                            }
+                        }
+                    },
+                    onPreviousClicked = {
+                        if (currentQuestionIndex > 0) {
+                            currentQuestionIndex -= 1
+                        }
+                    }
+                )
+            } else {
+                // Display end of quiz or summary screen
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "סיימת את השאלון! גש לקבל סוכריה",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
-        )
-    } else if (currentQuestionIndex >= questions.size) {
-        // Display end of quiz or summary screen
-        Text(
-            text = "סיימת את השאלון! גש לקבל סוכריה",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
-        )
+        }
     }
 }
 
