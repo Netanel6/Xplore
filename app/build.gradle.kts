@@ -86,4 +86,5 @@ dependencies {
     implementation(libs.firebaseCrashlytics)
     implementation(libs.firebaseAuth)
     implementation(libs.playServicesAuth)
+    implementation(libs.firebaseStorage)
 }

@@ -45,6 +45,7 @@ firebaseBom = { module = "com.google.firebase:firebase-bom", version.ref = "fire
 firebaseAnalytics = { module = "com.google.firebase:firebase-analytics" }
 firebaseCrashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebaseAuth = { module = "com.google.firebase:firebase-auth" }
+firebaseStorage = { module = "com.google.firebase:firebase-storage-ktx" }
 playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 

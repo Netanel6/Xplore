@@ -1,5 +1,6 @@
 package com.netanel.xplore.quiz.di
 import android.content.Context
+import com.google.firebase.storage.FirebaseStorage
 import com.netanel.xplore.quiz.repository.QuizRepository
 import dagger.Module
 import dagger.Provides
@@ -15,8 +16,8 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideQuizRepository(
-        @ApplicationContext context: Context
+        firebaseStorage: FirebaseStorage
     ): QuizRepository {
-        return QuizRepository(context)
+        return QuizRepository(firebaseStorage)
     }
 }
