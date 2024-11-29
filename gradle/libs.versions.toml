@@ -18,6 +18,9 @@ googleServicesPlugin = "4.4.2"
 crashlyticsPlugin = "3.0.2"
 playServicesAuth = "21.2.0"
 appcompat = "1.7.0"
+retrofit = "2.9.0"
+okhttp = "4.11.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +51,11 @@ firebaseAuth = { module = "com.google.firebase:firebase-auth" }
 firebaseStorage = { module = "com.google.firebase:firebase-storage-ktx" }
 playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

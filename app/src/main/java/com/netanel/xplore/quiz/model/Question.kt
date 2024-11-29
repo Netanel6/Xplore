@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class Question(
     val id: Int,
     val text: String,
+    val media: String,
     val answers: List<String>,
     val correctAnswerIndex: Int,
     val type: QuestionType
