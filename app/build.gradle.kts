@@ -79,7 +79,6 @@ dependencies {
     implementation(libs.glide)
     kapt(libs.glide.compiler)
 
-
     // Firebase
     implementation(platform(libs.firebaseBom))
     implementation(libs.firebaseAnalytics)
@@ -87,4 +86,10 @@ dependencies {
     implementation(libs.firebaseAuth)
     implementation(libs.playServicesAuth)
     implementation(libs.firebaseStorage)
+
+    // Retrofit + OKHttp
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
 }
