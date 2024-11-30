@@ -27,7 +27,6 @@ import com.netanel.xplore.auth.ui.AuthViewModel.*
 fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
     val phoneNumber by viewModel.phoneNumber
     val name by viewModel.name
-    val verificationInProgress by viewModel.verificationInProgress
     val authState by viewModel.authState
     val snackbarHostState = viewModel.snackbarHostState
     val context = LocalContext.current
@@ -52,57 +51,45 @@ fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewMo
                     )
                 }
                 is AuthState.VerificationCompleted -> {
+                    val user = (authState as AuthState.VerificationCompleted).user
                     Text(
-                        text = stringResource(R.string.to_login_write_name),
+                        text = stringResource(R.string.welcome_back, user.name),
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Button(onClick = { onLoginSuccess() }) {
+                        Text(text = stringResource(R.string.continue_to_dashboard))
+                    }
+                }
+                is AuthState.Error -> {
+                    val errorMessage = (authState as AuthState.Error).message
+                    Text(
+                        text = errorMessage,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Button(onClick = { viewModel.resetAuthState() }) {
+                        Text(text = stringResource(R.string.try_again))
+                    }
+                }
+                else -> {
+                    Text(
+                        text = stringResource(R.string.to_login_write_phone_number),
                         fontSize = 24.sp,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                     OutlinedTextField(
-                        value = name,
-                        onValueChange = { viewModel.name.value = it },
-                        label = { Text(stringResource(R.string.what_is_your_name)) },
+                        value = phoneNumber,
+                        onValueChange = { viewModel.phoneNumber.value = it },
+                        label = { Text(stringResource(R.string.what_is_your_number)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp)
                     )
                     Button(onClick = {
-                        viewModel.onSignInButtonClicked(context)
+                        viewModel.startUserVerification(context)
                     }) {
-                        Text(text = stringResource(R.string.shall_we))
-                    }
-                }
-                is AuthState.SignInSuccess -> {
-                    // Trigger navigation to the next page when SignInSuccess occurs.
-                    LaunchedEffect(Unit) {
-                        onLoginSuccess()
-                    }
-                }
-                is AuthState.Error -> {
-                    // Reset the AuthState to idle or other required state.
-                    LaunchedEffect(Unit) {
-                        viewModel.resetAuthState()
-                    }
-                }
-                else -> {
-                    if (!verificationInProgress) {
-                        Text(
-                            text = stringResource(R.string.to_login_write_phone_number),
-                            fontSize = 24.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        OutlinedTextField(
-                            value = phoneNumber,
-                            onValueChange = { viewModel.phoneNumber.value = it },
-                            label = { Text(stringResource(R.string.what_is_your_number)) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp)
-                        )
-                        Button(onClick = {
-                            viewModel.startPhoneNumberVerification(context)
-                        }) {
-                            Text(text = stringResource(R.string.next_step))
-                        }
+                        Text(text = stringResource(R.string.next_step))
                     }
                 }
             }
