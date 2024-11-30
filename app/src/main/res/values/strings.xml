@@ -18,4 +18,11 @@
     <string name="loading">טוען</string>
 
 
+
+    <string name="welcome_back">ברוך הבא, %1$s!</string>
+    <string name="continue_to_dashboard">בוא נשחק!</string>
+    <string name="try_again">נסה שוב</string>
+    <string name="generic_error">שגיאה כללית</string>
+    <string name="user_not_found">משתמש לא נמצא</string>
+
 </resources>
