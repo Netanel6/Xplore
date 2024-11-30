@@ -5,20 +5,10 @@
 
 
     <string name="to_login_write_phone_number">להתחברות יש לרשום את מספר הטלפון</string>
-    <string name="to_login_write_name">איך היית רוצה שנקרא לך?</string>
     <string name="what_is_your_number">מה מספר הטלפון שלך?</string>
-    <string name="israel_country_code">+972</string>
-    <string name="write_this_code_to_start">הקוד להתחלת השאלון הוא: 020415</string>
-    <string name="what_is_your_name">זה המקום לרשום את השם😊</string>
     <string name="next_step">שלב הבא</string>
-    <string name="shall_we">שנתחיל?</string>
     <string name="phone_num_incorrect">🫢 נראה שמספר הטלפון שרשמת לא נכון 🫢</string>
-    <string name="otp_incorrect">🫢 יכול להיות שהסיסמא שרשמת לא נכונה? 🫢</string>
-    <string name="otp">020415</string>
     <string name="loading">טוען</string>
-
-
-
     <string name="welcome_back">ברוך הבא, %1$s!</string>
     <string name="continue_to_dashboard">בוא נשחק!</string>
     <string name="try_again">נסה שוב</string>

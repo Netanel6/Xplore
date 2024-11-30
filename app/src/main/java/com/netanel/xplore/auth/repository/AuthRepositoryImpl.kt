@@ -10,8 +10,12 @@ import com.netanel.xplore.auth.repository.model.User
  */
 class AuthRepositoryImpl(private val api: UserApi): AuthRepository {
 
-    override suspend fun getUser(phoneNumber: String): User? {
-        val user = api.getUser(phoneNumber)
-        return user
+    override suspend fun getUser(phoneNumber: String): User {
+        val response = api.getUser(phoneNumber)
+        if (response.status == "success" && response.data != null) {
+            return response.data
+        } else {
+            throw Exception(response.message ?: "Unknown error")
+        }
     }
 }
