@@ -34,9 +34,7 @@ class AuthViewModel @Inject constructor(
         authState.value = AuthState.Loading
         viewModelScope.launch {
             try {
-                val user = authRepository.getUser(
-                    phoneNumber.value
-                )
+                val user = authRepository.getUser(phoneNumber.value)
 
                 if (user != null) {
                     saveUserDetails(user)

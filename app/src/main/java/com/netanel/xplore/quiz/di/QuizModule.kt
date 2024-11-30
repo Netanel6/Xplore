@@ -1,6 +1,7 @@
 package com.netanel.xplore.quiz.di
 import com.netanel.xplore.quiz.data.QuizApi
 import com.netanel.xplore.quiz.repository.QuizRepository
+import com.netanel.xplore.quiz.repository.QuizRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +22,7 @@ object QuizModule {
     @Provides
     @Singleton
     fun provideQuestionsRepository(api: QuizApi): QuizRepository {
-        return QuizRepository(api)
+        return QuizRepositoryImpl(api)
     }
 }
 

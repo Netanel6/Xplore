@@ -8,5 +8,5 @@ import com.netanel.xplore.auth.repository.model.User
  * NetanelCA2@gmail.com
  */
 interface AuthRepository {
-    suspend fun getUser(phoneNumber: String): User?
+    suspend fun getUser(phoneNumber: String): User
 }

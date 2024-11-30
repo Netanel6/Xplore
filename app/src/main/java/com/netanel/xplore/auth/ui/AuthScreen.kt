@@ -26,7 +26,6 @@ import com.netanel.xplore.auth.ui.AuthViewModel.*
 @Composable
 fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
     val phoneNumber by viewModel.phoneNumber
-    val name by viewModel.name
     val authState by viewModel.authState
     val snackbarHostState = viewModel.snackbarHostState
     val context = LocalContext.current
