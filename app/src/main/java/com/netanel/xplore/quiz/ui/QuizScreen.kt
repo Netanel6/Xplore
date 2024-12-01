@@ -1,5 +1,6 @@
 package com.netanel.xplore.quiz.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,11 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -30,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,100 +54,70 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
     var showAnimation by remember { mutableStateOf(false) }
     var animationType by remember { mutableStateOf(AnimationType.Idle) }
 
-    // Track answered questions that should be locked when revisited
     val lockedQuestions = remember { mutableStateListOf<Int>() }
-    // Track questions that have already shown the animation
     val animatedQuestions = remember { mutableStateListOf<Int>() }
-
-    // Store the selected answers for each question with mutable state wrappers
     val selectedAnswers = remember(questions) { MutableList(questions.size) { mutableStateOf<Int?>(null) } }
 
     if (questions.isEmpty()) {
-        // Handle empty questions list or loading state
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             Text(
                 text = "שאלות נטענות אנא חכה",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 16.dp),
                 textAlign = TextAlign.Center
             )
         }
     } else {
-        if (showAnimation) {
-            LottieAnimationScreen(
-                animationType = animationType,
-                onAnimationEnd = {
-                    showAnimation = false
-                    if (currentQuestionIndex < questions.size - 1) {
-                        // Move to next question after animation, if not the last question
-                        currentQuestionIndex += 1
-                    } else {
-                        // End of quiz reached
-                        currentQuestionIndex = questions.size // Ensures we display the end of quiz text
-                    }
-                }
-            )
-        } else {
-            if (currentQuestionIndex < questions.size) {
-                // Check if the current question should be locked based on previous answers
-                val isAnswerLocked = lockedQuestions.contains(currentQuestionIndex)
-
-                QuizQuestion(
-                    question = questions[currentQuestionIndex],
-                    currentQuestionNumber = currentQuestionIndex + 1,
-                    totalQuestions = questions.size,
-                    userSelectedAnswer = selectedAnswers[currentQuestionIndex].value,
-                    isAnswerLocked = isAnswerLocked,
-                    onAnswerSelected = { selectedIndex ->
-                        selectedAnswers[currentQuestionIndex].value = selectedIndex
-                    },
-                    onNextClicked = {
-                        if (selectedAnswers[currentQuestionIndex].value != null) {
-                            val isCorrect =
-                                selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
-                            animationType = if (isCorrect) AnimationType.Correct else AnimationType.Wrong
-
-                            // Show animation only if this question has not been animated before
-                            if (currentQuestionIndex !in animatedQuestions) {
-                                showAnimation = true
-                                animatedQuestions.add(currentQuestionIndex) // Mark this question as animated
-
-                                // Lock answer selection for this question
-                                if (currentQuestionIndex !in lockedQuestions) {
-                                    lockedQuestions.add(currentQuestionIndex)
-                                }
-                            } else {
-                                // If animation has already been shown, move directly to the next question
-                                if (currentQuestionIndex < questions.size - 1) {
-                                    currentQuestionIndex += 1
-                                } else {
-                                    // Handle transition to the end of quiz
-                                    currentQuestionIndex = questions.size
-                                }
-                            }
-                        }
-                    },
-                    onPreviousClicked = {
-                        if (currentQuestionIndex > 0) {
-                            currentQuestionIndex -= 1
+        AnimatedContent(targetState = showAnimation) { isAnimation ->
+            if (isAnimation) {
+                LottieAnimationScreen(
+                    animationType = animationType,
+                    onAnimationEnd = {
+                        showAnimation = false
+                        if (currentQuestionIndex < questions.size - 1) {
+                            currentQuestionIndex++
+                        } else {
+                            currentQuestionIndex = questions.size
                         }
                     }
                 )
             } else {
-                // Display end of quiz or summary screen
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "סיימת את השאלון! גש לקבל סוכריה",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(16.dp),
-                        textAlign = TextAlign.Center
+                if (currentQuestionIndex < questions.size) {
+                    val isAnswerLocked = lockedQuestions.contains(currentQuestionIndex)
+                    QuizQuestion(
+                        question = questions[currentQuestionIndex],
+                        currentQuestionNumber = currentQuestionIndex + 1,
+                        totalQuestions = questions.size,
+                        userSelectedAnswer = selectedAnswers[currentQuestionIndex].value,
+                        isAnswerLocked = isAnswerLocked,
+                        onAnswerSelected = { selectedIndex ->
+                            selectedAnswers[currentQuestionIndex].value = selectedIndex
+                        },
+                        onNextClicked = {
+                            if (selectedAnswers[currentQuestionIndex].value != null) {
+                                val isCorrect =
+                                    selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
+                                animationType = if (isCorrect) AnimationType.Correct else AnimationType.Wrong
+
+                                if (currentQuestionIndex !in animatedQuestions) {
+                                    showAnimation = true
+                                    animatedQuestions.add(currentQuestionIndex)
+                                    lockedQuestions.add(currentQuestionIndex)
+                                } else {
+                                    if (currentQuestionIndex < questions.size - 1) currentQuestionIndex++
+                                }
+                            }
+                        },
+                        onPreviousClicked = {
+                            if (currentQuestionIndex > 0) currentQuestionIndex--
+                        }
                     )
+                } else {
+                    QuizEndScreen()
                 }
             }
         }
@@ -157,22 +135,18 @@ fun QuizQuestion(
     onNextClicked: () -> Unit,
     onPreviousClicked: () -> Unit
 ) {
-    // Create a shuffled set of answers for each question separately
     val shuffledAnswers = remember(currentQuestionNumber) {
-        val answersWithIndex = question.answers.mapIndexed { index, answer ->
-            index to answer
-        }.shuffled()
-        answersWithIndex
+        val answersWithIndex = question.answers.mapIndexed { index, answer -> index to answer }
+        answersWithIndex.shuffled()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top bar with question number and progress indicator
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -181,7 +155,7 @@ fun QuizQuestion(
             if (currentQuestionNumber > 1) {
                 Text(
                     text = "לשאלה הקודמת",
-                    color = Color(0xFF1B5E20),
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable { onPreviousClicked() }
@@ -191,16 +165,16 @@ fun QuizQuestion(
             }
             Text(
                 text = "$currentQuestionNumber/$totalQuestions",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(8.dp)
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.secondary
             )
         }
-        // Question text
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = MaterialTheme.shapes.medium,
+            shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Text(
@@ -213,19 +187,18 @@ fun QuizQuestion(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // List of answers
         Column(modifier = Modifier.fillMaxWidth()) {
-            shuffledAnswers.forEachIndexed { index, (originalIndex, answer) ->
+            shuffledAnswers.forEachIndexed { _, (originalIndex, answer) ->
                 val isSelected = userSelectedAnswer == originalIndex
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .clickable(enabled = !isAnswerLocked) { onAnswerSelected(originalIndex) },
-                    shape = MaterialTheme.shapes.medium,
+                    shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) Color(0xFFB2DFDB) else Color.White
+                        containerColor = if (isSelected) MaterialTheme.colorScheme.tertiary else Color.White
                     )
                 ) {
                     Row(
@@ -234,12 +207,12 @@ fun QuizQuestion(
                     ) {
                         RadioButton(
                             selected = isSelected,
-                            onClick = null // RadioButton is displayed but not clickable independently
+                            onClick = null // RadioButton is for display only
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = answer,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
                         )
                     }
                 }
@@ -248,16 +221,37 @@ fun QuizQuestion(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Next button
         Button(
             onClick = { onNextClicked() },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF004D40))
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Text(
                 text = "לשאלה הבאה",
-                color = Color.White,
-                modifier = Modifier.padding(8.dp)
+                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+            )
+        }
+    }
+}
+
+@Composable
+fun QuizEndScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = "Quiz Completed",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(80.dp)
+            )
+            Text(
+                text = "סיימת את השאלון! גש לקבל סוכריה",
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -266,33 +260,23 @@ fun QuizQuestion(
 @Composable
 fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Unit) {
     val animationFile = if (animationType == AnimationType.Correct) "correct.json" else "wrong.json"
-
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(animationFile))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = 1,
-        speed = 1f
-    )
+    val progress by animateLottieCompositionAsState(composition, iterations = 1)
 
     LaunchedEffect(progress) {
-        if (progress == 1f) {
-            onAnimationEnd()
-        }
+        if (progress == 1f) onAnimationEnd()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
-        LottieAnimation(
-            composition = composition,
-            progress = progress,
-            modifier = Modifier.fillMaxSize(0.8f)
-        )
+        LottieAnimation(composition, progress, modifier = Modifier.size(300.dp))
     }
 }
+
 
 enum class AnimationType {
     Correct,
