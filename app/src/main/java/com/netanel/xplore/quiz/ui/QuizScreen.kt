@@ -1,6 +1,7 @@
 package com.netanel.xplore.quiz.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,12 +41,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.netanel.xplore.quiz.model.Question
+import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
+import com.netanel.xplore.quiz.ui.composables.QuizQuestion
 
 @Composable
 fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
@@ -124,138 +128,7 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
     }
 }
 
-@Composable
-fun QuizQuestion(
-    question: Question,
-    currentQuestionNumber: Int,
-    totalQuestions: Int,
-    userSelectedAnswer: Int?,
-    isAnswerLocked: Boolean,
-    onAnswerSelected: (Int) -> Unit,
-    onNextClicked: () -> Unit,
-    onPreviousClicked: () -> Unit
-) {
-    val shuffledAnswers = remember(currentQuestionNumber) {
-        val answersWithIndex = question.answers.mapIndexed { index, answer -> index to answer }
-        answersWithIndex.shuffled()
-    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (currentQuestionNumber > 1) {
-                Text(
-                    text = "לשאלה הקודמת",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable { onPreviousClicked() }
-                )
-            } else {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            Text(
-                text = "$currentQuestionNumber/$totalQuestions",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp)
-        ) {
-            Text(
-                text = question.text,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(16.dp),
-                textAlign = TextAlign.Center
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Column(modifier = Modifier.fillMaxWidth()) {
-            shuffledAnswers.forEachIndexed { _, (originalIndex, answer) ->
-                val isSelected = userSelectedAnswer == originalIndex
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable(enabled = !isAnswerLocked) { onAnswerSelected(originalIndex) },
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) MaterialTheme.colorScheme.tertiary else Color.White
-                    )
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        RadioButton(
-                            selected = isSelected,
-                            onClick = null // RadioButton is for display only
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = answer,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { onNextClicked() },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-            Text(
-                text = "לשאלה הבאה",
-                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
-            )
-        }
-    }
-}
-
-@Composable
-fun QuizEndScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Quiz Completed",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(80.dp)
-            )
-            Text(
-                text = "סיימת את השאלון! גש לקבל סוכריה",
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
 
 @Composable
 fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Unit) {
@@ -276,6 +149,8 @@ fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Un
         LottieAnimation(composition, progress, modifier = Modifier.size(300.dp))
     }
 }
+
+
 
 
 enum class AnimationType {
