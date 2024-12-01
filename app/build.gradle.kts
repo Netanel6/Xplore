@@ -1,3 +1,12 @@
+import java.util.Properties
+
+val keystorePropertiesFile = rootProject.file("keys/keystore.properties")
+val keystoreProperties = Properties()
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +17,7 @@ plugins {
     alias(libs.plugins.googleServices)
     alias(libs.plugins.firebaseCrashlytics)
 }
+
 
 android {
     namespace = "com.netanel.xplore"
@@ -23,6 +33,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = keystoreProperties["storeFile"]?.let { file(it.toString()) }
+            storePassword = keystoreProperties["storePassword"]?.toString()
+            keyAlias = keystoreProperties["keyAlias"]?.toString()
+            keyPassword = keystoreProperties["keyPassword"]?.toString()
+        }
+    }
+
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -30,9 +50,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://xplore-653a16181c0e.herokuapp.com\"")
+            signingConfig = signingConfigs.getByName("release")
 
+            buildConfigField("String", "BASE_URL", "\"https://xplore-653a16181c0e.herokuapp.com\"")
         }
+
         debug {
             isMinifyEnabled = false
             isDebuggable = true
