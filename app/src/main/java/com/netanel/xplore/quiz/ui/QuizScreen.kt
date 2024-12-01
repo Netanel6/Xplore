@@ -50,17 +50,20 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
 import com.netanel.xplore.quiz.ui.composables.QuizQuestion
-
 @Composable
 fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
     val questions by viewModel.questions.collectAsState()
+    val totalScore by viewModel.totalScore.collectAsState()
     var currentQuestionIndex by remember { mutableIntStateOf(0) }
     var showAnimation by remember { mutableStateOf(false) }
     var animationType by remember { mutableStateOf(AnimationType.Idle) }
+    var pointsGained by remember { mutableStateOf(0) }
+    var isCorrect by remember { mutableStateOf(false) }
 
     val lockedQuestions = remember { mutableStateListOf<Int>() }
     val animatedQuestions = remember { mutableStateListOf<Int>() }
     val selectedAnswers = remember(questions) { MutableList(questions.size) { mutableStateOf<Int?>(null) } }
+    val scoredQuestions = remember { mutableStateListOf<Int>() }
 
     if (questions.isEmpty()) {
         Box(
@@ -76,10 +79,11 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
             )
         }
     } else {
-        AnimatedContent(targetState = showAnimation) { isAnimation ->
+        AnimatedContent(targetState = showAnimation, label = "Animated content") { isAnimation ->
             if (isAnimation) {
-                LottieAnimationScreen(
-                    animationType = animationType,
+                PointsAnimationScreen(
+                    points = pointsGained,
+                    isCorrect = isCorrect,
                     onAnimationEnd = {
                         showAnimation = false
                         if (currentQuestionIndex < questions.size - 1) {
@@ -102,10 +106,17 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
                             selectedAnswers[currentQuestionIndex].value = selectedIndex
                         },
                         onNextClicked = {
-                            if (selectedAnswers[currentQuestionIndex].value != null) {
-                                val isCorrect =
-                                    selectedAnswers[currentQuestionIndex].value == questions[currentQuestionIndex].correctAnswerIndex
+                            val selectedIndex = selectedAnswers[currentQuestionIndex].value
+                            if (selectedIndex != null) {
+                                isCorrect =
+                                    selectedIndex == questions[currentQuestionIndex].correctAnswerIndex
                                 animationType = if (isCorrect) AnimationType.Correct else AnimationType.Wrong
+
+                                if (isCorrect && currentQuestionIndex !in scoredQuestions) {
+                                    pointsGained = questions[currentQuestionIndex].points
+                                    viewModel.addScore(pointsGained)
+                                    scoredQuestions.add(currentQuestionIndex)
+                                }
 
                                 if (currentQuestionIndex !in animatedQuestions) {
                                     showAnimation = true
@@ -121,18 +132,16 @@ fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
                         }
                     )
                 } else {
-                    QuizEndScreen()
+                    QuizEndScreen(totalScore = totalScore)
                 }
             }
         }
     }
 }
 
-
-
 @Composable
-fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Unit) {
-    val animationFile = if (animationType == AnimationType.Correct) "correct.json" else "wrong.json"
+fun PointsAnimationScreen(points: Int, isCorrect: Boolean, onAnimationEnd: () -> Unit) {
+    val animationFile = if (isCorrect) "correct.json" else "wrong.json"
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(animationFile))
     val progress by animateLottieCompositionAsState(composition, iterations = 1)
 
@@ -146,9 +155,27 @@ fun LottieAnimationScreen(animationType: AnimationType, onAnimationEnd: () -> Un
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
-        LottieAnimation(composition, progress, modifier = Modifier.size(300.dp))
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            LottieAnimation(composition, progress, modifier = Modifier.size(300.dp))
+            if (isCorrect) {
+                Text(
+                    text = "+$points נקודות",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            // TODO: Decided whether to show the text or not according to the animation (wrong animation)
+            /* else {
+                Text(
+                    text = "תשובה לא נכונה!",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }*/
+        }
     }
 }
+
 
 
 
