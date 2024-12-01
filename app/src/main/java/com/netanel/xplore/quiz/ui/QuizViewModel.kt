@@ -27,6 +27,11 @@ class QuizViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
 
+    // DataFlow to handle scoring
+    private val _totalScore = MutableStateFlow(0)
+    val totalScore: StateFlow<Int> get() = _totalScore
+
+
     init {
         loadQuestions()
     }
@@ -46,4 +51,9 @@ class QuizViewModel @Inject constructor(
             }
         }
     }
+
+    fun addScore(points: Int) {
+        _totalScore.value += points
+    }
+
 }

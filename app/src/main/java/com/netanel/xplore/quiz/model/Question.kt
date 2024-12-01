@@ -9,6 +9,7 @@ data class Question(
     val media: String,
     val answers: List<String>,
     val correctAnswerIndex: Int,
+    val points: Int,
     val type: QuestionType
 )
 
