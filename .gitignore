@@ -22,3 +22,5 @@ gradle/wrapper/gradle-wrapper.properties
 .idea/inspectionProfiles/Project_Default.xml
 .idea/deploymentTargetSelector.xml
 .idea/deploymentTargetSelector.xml
+keys/keystore.properties
+keys/XploreKey

@@ -18,10 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.netanel.xplore.auth.ui.AuthScreen
 import com.netanel.xplore.navigation.NavigationStack
-import com.netanel.xplore.quiz.ui.QuizScreen
 import com.netanel.xplore.ui.theme.XploreTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
