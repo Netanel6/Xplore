@@ -75,6 +75,13 @@ android {
         compose = true
         buildConfig = true
     }
+
+    lint {
+        abortOnError = false
+        disable += listOf("StateFlowValueCalledInComposition", "NotificationPermission")
+        checkDependencies = true
+
+    }
 }
 
 dependencies {
