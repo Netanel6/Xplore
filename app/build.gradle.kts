@@ -1,11 +1,11 @@
 import java.util.Properties
 
-val keystorePropertiesFile = rootProject.file("keys/keystore.properties")
 val keystoreProperties = Properties()
-
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(keystorePropertiesFile.inputStream())
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+if (!keystorePropertiesFile.exists()) {
+    throw GradleException("keystore.properties file is missing at ${keystorePropertiesFile.path}")
 }
+keystoreProperties.load(keystorePropertiesFile.inputStream())
 
 plugins {
     alias(libs.plugins.android.application)
@@ -18,7 +18,6 @@ plugins {
     alias(libs.plugins.firebaseCrashlytics)
 }
 
-
 android {
     namespace = "com.netanel.xplore"
     compileSdk = 34
@@ -29,19 +28,17 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
-            storeFile = keystoreProperties["storeFile"]?.let { file(it.toString()) }
+            storeFile = file(keystoreProperties["storeFile"]?.toString() ?: throw GradleException("Keystore file path is missing"))
             storePassword = keystoreProperties["storePassword"]?.toString()
             keyAlias = keystoreProperties["keyAlias"]?.toString()
             keyPassword = keystoreProperties["keyPassword"]?.toString()
         }
     }
-
 
     buildTypes {
         release {
@@ -51,18 +48,15 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
-
             buildConfigField("String", "BASE_URL", "\"https://xplore-653a16181c0e.herokuapp.com\"")
         }
 
         debug {
             isMinifyEnabled = false
             isDebuggable = true
-
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080\"")
         }
     }
-
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -80,7 +74,6 @@ android {
         abortOnError = false
         disable += listOf("StateFlowValueCalledInComposition", "NotificationPermission")
         checkDependencies = true
-
     }
 }
 
