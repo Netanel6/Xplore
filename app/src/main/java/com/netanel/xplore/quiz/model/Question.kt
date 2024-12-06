@@ -4,16 +4,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Question(
-    val id: Int,
-    val text: String,
-    val media: String,
-    val answers: List<String>,
-    val correctAnswerIndex: Int,
+    var id: Int? = null,
+    val media: String? = null,
+    val text: String? = null,
+    val answers: List<String>? = null,
+    val explanation: String? = null,
+    val correctAnswerIndex: Int? = null,
     val points: Int,
-    val type: QuestionType
-)
-
-enum class QuestionType {
-    American,
-    TrueOrFalse
+    val type: QuestionType? = null,
+    val difficulty: DifficultyLevel,
+    val isMandatory: Boolean? = null
+) {
+    @Serializable
+    enum class QuestionType {
+        American, TrueOrFalse, FillInTheBlank
+    }
 }

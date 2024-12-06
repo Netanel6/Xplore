@@ -44,4 +44,5 @@ object SharedPrefKeys {
     val PHONE_NUMBER = "phone_number"
     val USER_NAME = "user_name"
     val IS_LOGGED_IN = "is_logged_in"
+    val QUIZ_ID = "quiz_id"
 }
