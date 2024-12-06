@@ -38,7 +38,7 @@ fun NavigationStack(viewModel: MainActivityViewModel = hiltViewModel()) {
         }
 
         composable(route = Screen.QuizScreen.route) {
-            QuizScreen()
+            QuizScreen("6752d4ab8ad02ea83f05b501")
         }
     }
 }

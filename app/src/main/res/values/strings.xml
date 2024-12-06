@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Xplore</string>
     <string name="he_lang">he</string>
-    <string name="web_client_id">155891417073-3ej2096123bojnn9jhng5fs22dnpn8ou.apps.googleusercontent.com</string>
-
 
     <string name="to_login_write_phone_number">להתחברות יש לרשום את מספר הטלפון</string>
     <string name="what_is_your_number">מה מספר הטלפון שלך?</string>

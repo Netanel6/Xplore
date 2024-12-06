@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.netanel.xplore.quiz.model.Question
+import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.repository.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,10 @@ import javax.inject.Inject
 class QuizViewModel @Inject constructor(
     private val repository: QuizRepository
 ) : ViewModel() {
+
+    // StateFlow to hold the quiz
+    private val _quiz = MutableStateFlow<Quiz?>(null)
+    val quiz: StateFlow<Quiz?> get() = _quiz
 
     // StateFlow to hold the list of questions
     private val _questions = MutableStateFlow<List<Question>>(emptyList())
@@ -32,25 +37,23 @@ class QuizViewModel @Inject constructor(
     val totalScore: StateFlow<Int> get() = _totalScore
 
 
-    init {
-        loadQuestions()
-    }
-
-    private fun loadQuestions() {
+    fun loadQuiz(quizId: String) {
         viewModelScope.launch {
-            _isLoading.value = true // Start loading
+            _isLoading.value = true
             try {
-                val result = repository.getQuestions()
-                _questions.value = result
-                _error.value = null // Reset error state
+                val loadedQuiz = repository.getQuiz(quizId)
+                _quiz.value = loadedQuiz
+                _questions.value = loadedQuiz.questions
+                _error.value = null
             } catch (e: Exception) {
                 e.printStackTrace()
-                _error.value = "Failed to load questions: ${e.message}" // Update error state
+                _error.value = "Failed to load quiz: ${e.message}"
             } finally {
-                _isLoading.value = false // End loading
+                _isLoading.value = false
             }
         }
     }
+
 
     fun addScore(points: Int) {
         _totalScore.value += points

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,66 +39,65 @@ fun QuizQuestion(
     onPreviousClicked: () -> Unit
 ) {
     val shuffledAnswers = remember(currentQuestionNumber) {
-        val answersWithIndex = question.answers.mapIndexed { index, answer -> index to answer }
-        answersWithIndex.shuffled()
+        question.answers?.mapIndexed { index, answer -> index to answer }?.shuffled()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
+        // Navigation and Question Number
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (currentQuestionNumber > 1) {
-              PreviousQuestionButton {
-                  onPreviousClicked()
-              }
-            } else {
-                Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { onPreviousClicked() },
+                enabled = currentQuestionNumber > 1,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("קודם")
             }
             QuestionNumberDisplay(currentQuestionNumber, totalQuestions)
         }
 
+        // Question Text
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(8.dp),
             shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp)
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
             Text(
-                text = question.text,
+                text = question.text.orEmpty(),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(16.dp),
                 textAlign = TextAlign.Center
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
+        // Answer Options
         Column(modifier = Modifier.fillMaxWidth()) {
-            shuffledAnswers.forEachIndexed { _, (originalIndex, answer) ->
+            shuffledAnswers?.forEach { (originalIndex, answer) ->
                 val isSelected = userSelectedAnswer == originalIndex
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .clickable(enabled = !isAnswerLocked) { onAnswerSelected(originalIndex) },
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(2.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) MaterialTheme.colorScheme.tertiary else Color.White
+                        containerColor = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface
                     )
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(12.dp)
                     ) {
                         RadioButton(
                             selected = isSelected,
@@ -116,17 +113,16 @@ fun QuizQuestion(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
+        // Next Question Button
         Button(
             onClick = { onNextClicked() },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            enabled = userSelectedAnswer != null,
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
-            Text(
-                text = "לשאלה הבאה",
-                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
-            )
+            Text("לשאלה הבאה")
         }
     }
 }
