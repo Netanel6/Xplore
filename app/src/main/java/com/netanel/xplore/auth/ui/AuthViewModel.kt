@@ -17,8 +17,7 @@ import javax.inject.Inject
 /**
  * Created by netanelamar on 01/11/2024.
  * NetanelCA2@gmail.com
- */
-@HiltViewModel
+ */@HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val sharedPreferencesManager: SharedPreferencesManager
@@ -26,9 +25,15 @@ class AuthViewModel @Inject constructor(
 
     var phoneNumber = mutableStateOf("")
     var name = mutableStateOf("")
+    var selectedQuizId = mutableStateOf("") // New property for selected quiz ID
     val snackbarHostState = SnackbarHostState()
     var authState = mutableStateOf<AuthState>(AuthState.Idle)
         private set
+
+    init {
+        // Initialize selectedQuizId with the saved value from SharedPreferences
+        selectedQuizId.value = sharedPreferencesManager.getString(SharedPrefKeys.QUIZ_ID)
+    }
 
     fun startUserVerification(context: Context) {
         authState.value = AuthState.Loading
@@ -56,6 +61,13 @@ class AuthViewModel @Inject constructor(
         sharedPreferencesManager.saveString(SharedPrefKeys.PHONE_NUMBER, user.phoneNumber)
         sharedPreferencesManager.saveString(SharedPrefKeys.USER_NAME, user.name)
         sharedPreferencesManager.saveBoolean(SharedPrefKeys.IS_LOGGED_IN, true)
+        val initialQuizId = user.quizzes.getOrNull(0)?.id.orEmpty()
+        saveSelectedQuizId(initialQuizId)
+    }
+
+    fun saveSelectedQuizId(quizId: String) {
+        sharedPreferencesManager.saveString(SharedPrefKeys.QUIZ_ID, quizId)
+        selectedQuizId.value = quizId
     }
 
     fun resetAuthState() {

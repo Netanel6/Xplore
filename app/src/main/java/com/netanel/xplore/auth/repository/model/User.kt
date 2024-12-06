@@ -13,5 +13,13 @@ import kotlinx.serialization.Serializable
 data class User(
     val name: String,
     @SerializedName(value = "phone_number")
-    val phoneNumber: String
-)
+    val phoneNumber: String,
+    @SerializedName(value = "quiz_list")
+    val quizzes: List<Quiz>
+) {
+    @Serializable
+    data class Quiz(
+        val id: String,
+        val title: String
+    )
+}

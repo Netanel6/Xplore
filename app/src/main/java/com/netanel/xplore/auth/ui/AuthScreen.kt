@@ -10,12 +10,17 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,6 +33,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -36,6 +43,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,14 +56,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
-import com.netanel.xplore.auth.ui.AuthViewModel.AuthState
-
-@OptIn(ExperimentalAnimationApi::class)
+import com.netanel.xplore.auth.ui.AuthViewModel.AuthState@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
+fun AuthScreen(onLoginSuccess: (String) -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
     val phoneNumber by viewModel.phoneNumber
     val authState by viewModel.authState
     val snackbarHostState = viewModel.snackbarHostState
+    val selectedQuizId by viewModel.selectedQuizId
     val context = LocalContext.current
 
     Scaffold(
@@ -75,7 +84,7 @@ fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewMo
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.app_logo),
-                    contentDescription = "App Logo",
+                    contentDescription = "App logo",
                     modifier = Modifier
                         .size(100.dp)
                         .padding(bottom = 16.dp)
@@ -89,12 +98,11 @@ fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewMo
                 exit = slideOutVertically(targetOffsetY = { -50 }) + fadeOut()
             ) {
                 Text(
-//                    text = stringResource(R.string.auth_screen_title),
-                    text = "Xplore",
-                    fontSize = 26.sp,
+                    text = stringResource(R.string.app_name),
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 24.dp)
                 )
             }
 
@@ -116,27 +124,93 @@ fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewMo
                         }
                         is AuthState.VerificationCompleted -> {
                             val user = (authState as AuthState.VerificationCompleted).user
-                            SuccessMessage(user.name)
-                            Button(
-                                onClick = { onLoginSuccess() },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
+                            val quizzes = user.quizzes
+                            var isDropdownExpanded by remember { mutableStateOf(false) }
+
+                            // Dropdown Title
+                            Text(
+                                text = stringResource(R.string.select_quiz),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+
+                            // Custom Dropdown Menu
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp)
+                                    .clickable { isDropdownExpanded = !isDropdownExpanded }
+                                    .padding(12.dp)
+                                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                                    .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
                             ) {
-                                Text(text = stringResource(R.string.continue_to_dashboard))
+                                Text(
+                                    text = quizzes.find { it.id == selectedQuizId }?.title
+                                        ?: stringResource(R.string.select_quiz),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+                                DropdownMenu(
+                                    expanded = isDropdownExpanded,
+                                    onDismissRequest = { isDropdownExpanded = false }
+                                ) {
+                                    quizzes.forEach { quiz ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = quiz.title,
+                                                    color = if (quiz.id == selectedQuizId)
+                                                        MaterialTheme.colorScheme.secondary
+                                                    else MaterialTheme.colorScheme.onSurface,
+                                                    fontWeight = if (quiz.id == selectedQuizId) FontWeight.Bold else FontWeight.Normal
+                                                )
+                                            },
+                                            onClick = {
+                                                viewModel.saveSelectedQuizId(quiz.id)
+                                                isDropdownExpanded = false
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(
+                                                    if (quiz.id == selectedQuizId)
+                                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                                    else MaterialTheme.colorScheme.surface
+                                                )
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Continue Button
+                            Button(
+                                onClick = { onLoginSuccess(selectedQuizId) },
+                                enabled = selectedQuizId.isNotEmpty(),
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text(text = stringResource(R.string.continue_to_quiz))
                             }
                         }
                         is AuthState.Error -> {
                             val errorMessage = (authState as AuthState.Error).message
                             ErrorMessage(errorMessage)
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Retry Button
                             Button(
                                 onClick = { viewModel.resetAuthState() },
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.error
-                                ),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Text(text = stringResource(R.string.try_again))
+                                Text(text = stringResource(R.string.retry))
                             }
                         }
                         else -> {
