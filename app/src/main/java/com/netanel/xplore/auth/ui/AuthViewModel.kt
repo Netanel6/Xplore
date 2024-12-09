@@ -25,13 +25,12 @@ class AuthViewModel @Inject constructor(
 
     var phoneNumber = mutableStateOf("")
     var name = mutableStateOf("")
-    var selectedQuizId = mutableStateOf("") // New property for selected quiz ID
+    var selectedQuizId = mutableStateOf("")
     val snackbarHostState = SnackbarHostState()
     var authState = mutableStateOf<AuthState>(AuthState.Idle)
         private set
 
     init {
-        // Initialize selectedQuizId with the saved value from SharedPreferences
         selectedQuizId.value = sharedPreferencesManager.getString(SharedPrefKeys.QUIZ_ID)
     }
 
