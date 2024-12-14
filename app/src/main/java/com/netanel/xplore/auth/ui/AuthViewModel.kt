@@ -61,6 +61,7 @@ class AuthViewModel @Inject constructor(
         sharedPreferencesManager.saveString(SharedPrefKeys.PHONE_NUMBER, user.phoneNumber)
         sharedPreferencesManager.saveString(SharedPrefKeys.USER_NAME, user.name)
         sharedPreferencesManager.saveBoolean(SharedPrefKeys.IS_LOGGED_IN, true)
+        sharedPreferencesManager.saveString(SharedPrefKeys.TOKEN, user.token)
         val initialQuizId = user.quizzes.getOrNull(0)?.id.orEmpty()
         saveSelectedQuizId(initialQuizId)
     }
