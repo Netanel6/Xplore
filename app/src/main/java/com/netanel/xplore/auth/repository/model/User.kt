@@ -14,6 +14,7 @@ data class User(
     val name: String,
     @SerializedName(value = "phone_number")
     val phoneNumber: String,
+    val token: String,
     @SerializedName(value = "quiz_list")
     val quizzes: List<Quiz>
 ) {

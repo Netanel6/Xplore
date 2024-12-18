@@ -20,14 +20,14 @@ class MainActivityViewModel @Inject constructor(
     val isUserLoggedInFlow: StateFlow<Boolean> = _isUserLoggedInFlow
 
     // Expose quizId state
-    private val _quizId = MutableStateFlow("")
-    val quizId: StateFlow<String> = _quizId
+    private val _selectedQuiz = MutableStateFlow("")
+    val selectedQuiz: StateFlow<String> = _selectedQuiz
 
     init {
         // Initialize states from SharedPreferences
         viewModelScope.launch {
             _isUserLoggedInFlow.value = sharedPreferencesManager.getBoolean(SharedPrefKeys.IS_LOGGED_IN)
-            _quizId.value = sharedPreferencesManager.getString(SharedPrefKeys.QUIZ_ID).orEmpty()
+            _selectedQuiz.value = sharedPreferencesManager.getString(SharedPrefKeys.QUIZ_ID)
         }
     }
 
@@ -41,7 +41,7 @@ class MainActivityViewModel @Inject constructor(
     fun updateQuizId(quizId: String) {
         viewModelScope.launch {
             sharedPreferencesManager.saveString(SharedPrefKeys.QUIZ_ID, quizId)
-            _quizId.value = quizId
+            _selectedQuiz.value = quizId
         }
     }
 }

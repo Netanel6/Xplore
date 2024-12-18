@@ -1,6 +1,7 @@
 package com.netanel.xplore.di
 
 import com.netanel.xplore.BuildConfig
+import com.netanel.xplore.utils.TokenInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,7 +11,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
-
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -25,9 +25,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+    fun provideOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        tokenInterceptor: TokenInterceptor
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(tokenInterceptor)
             .build()
     }
 

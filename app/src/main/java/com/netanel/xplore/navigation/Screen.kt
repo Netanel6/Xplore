@@ -2,6 +2,7 @@ package com.netanel.xplore.navigation
 
 
 sealed class Screen(val route: String) {
-    object AuthScreen : Screen("auth_screen")
-    object QuizScreen : Screen("quiz_screen")
+    data object AuthScreen : Screen("auth_screen")
+    data object HomeScreen : Screen("home_screen")
+    data object QuizScreen : Screen("quiz_screen")
 }
