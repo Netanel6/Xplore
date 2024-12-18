@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.netanel.xplore.home.viewmodel.HomeViewModel
 import com.netanel.xplore.quiz.ui.composables.LoadingScreen
 
 @Composable

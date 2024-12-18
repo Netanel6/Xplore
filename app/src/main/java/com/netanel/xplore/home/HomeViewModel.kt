@@ -1,4 +1,4 @@
-package com.netanel.xplore.home.viewmodel
+package com.netanel.xplore.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +32,7 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = true
         viewModelScope.launch {
             try {
+                // TODO: Change the endpoint to get list of quizzes
                 val quiz = quizRepository.getQuiz("6752d4ab8ad02ea83f05b501")
                 _quiz.value = quiz
                 _isLoading.value = false
