@@ -16,7 +16,8 @@ data class User(
     val phoneNumber: String,
     val token: String,
     @SerializedName(value = "quiz_list")
-    val quizzes: List<Quiz>
+    val quizzes: List<Quiz>,
+    val id: String? = null
 ) {
     @Serializable
     data class Quiz(
