@@ -12,7 +12,7 @@ fun HomeScreen(
     onQuizSelected: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val quiz by viewModel.quiz.collectAsState()
+    val quiz by viewModel.quizList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
