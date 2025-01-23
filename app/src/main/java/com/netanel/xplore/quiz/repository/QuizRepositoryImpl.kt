@@ -29,4 +29,12 @@ class QuizRepositoryImpl(private val api: QuizApi): QuizRepository {
         }
     }
 
+    override suspend fun getQuizList(): List<Quiz> {
+        val response = api.getQuizList()
+        if (response.status == "success" && response.data != null) {
+            return response.data
+        } else {
+            throw Exception(response.message ?: "Unknown error")
+        }
+    }
 }

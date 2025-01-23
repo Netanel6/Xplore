@@ -20,7 +20,7 @@ fun QuizScreen(
     viewModel: QuizViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
-        viewModel.loadQuiz(quizId)
+        viewModel.loadQuiz("6752d4ab8ad02ea83f05b501")
     }
 
     val quiz by viewModel.quiz.collectAsState()

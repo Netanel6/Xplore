@@ -15,8 +15,8 @@ class HomeViewModel @Inject constructor(
     private val quizRepository: QuizRepository
 ) : ViewModel() {
 
-    private val _quiz = MutableStateFlow<Quiz?>(null)
-    val quiz: StateFlow<Quiz?> = _quiz
+    private val _quizzes = MutableStateFlow<List<Quiz>?>(null)
+    val quizList: StateFlow<List<Quiz>?> = _quizzes
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -33,8 +33,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 // TODO: Change the endpoint to get list of quizzes
-                val quiz = quizRepository.getQuiz("6752d4ab8ad02ea83f05b501")
-                _quiz.value = quiz
+                val quiz = quizRepository.getQuizList()
+                _quizzes.value = quiz
                 _isLoading.value = false
             } catch (e: Exception) {
                 _errorMessage.value = e.message
