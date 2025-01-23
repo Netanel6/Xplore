@@ -35,12 +35,12 @@ fun NavigationStack(viewModel: MainActivityViewModel = hiltViewModel()) {
         composable(route = Screen.HomeScreen.route) {
             HomeScreen(
                 onQuizSelected = { quizId ->
-                    navController.navigate("${Screen.QuizScreen.route}/$quizId")
+                    navController.navigate(Screen.QuizScreen.route)
                 }
             )
         }
 
-        composable(route = "${Screen.QuizScreen.route}/{quizId}") { backStackEntry ->
+        composable(route = Screen.QuizScreen.route) { backStackEntry ->
             val quizId = backStackEntry.arguments?.getString("quizId") ?: ""
             QuizScreen(quizId)
         }
