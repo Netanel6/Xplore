@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,9 +33,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.ui.composables.LoadingScreen
 import com.netanel.xplore.R
+import com.netanel.xplore.auth.repository.model.User
 
 @Composable
 fun HomeScreen(
+    userId: String,
     onQuizSelected: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -43,6 +46,10 @@ fun HomeScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     var isPopupOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(userId) {
+        viewModel.fetchQuizzes(userId)
+    }
 
     if (isLoading) {
         LoadingScreen()
@@ -87,7 +94,7 @@ fun HomeScreen(
 
 @Composable
 fun QuizListPopup(
-    quizzes: List<Quiz>,
+    quizzes: List<User.Quiz>,
     onQuizSelected: (String) -> Unit,
     onClose: () -> Unit
 ) {
@@ -103,7 +110,7 @@ fun QuizListPopup(
                 items(quizzes) { quiz ->
                     QuizListItem(
                         quiz = quiz,
-                        onClick = { onQuizSelected(quiz.creatorId.toString()) }
+                        onClick = { onQuizSelected(quiz.id) }
                     )
                 }
             }
@@ -117,7 +124,7 @@ fun QuizListPopup(
 }
 
 @Composable
-fun QuizListItem(quiz: Quiz, onClick: () -> Unit) {
+fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,9 +137,7 @@ fun QuizListItem(quiz: Quiz, onClick: () -> Unit) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = quiz.title.toString(), style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            quiz.description?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+            Text(text = quiz.title, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
