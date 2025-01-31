@@ -20,4 +20,4 @@ interface QuizApi {
 
     @GET("/quizzes/{userId}")
     suspend fun getUserQuizList(@Path("userId") userId: String): ServerResponse<List<User.Quiz>>
-}
+} 
