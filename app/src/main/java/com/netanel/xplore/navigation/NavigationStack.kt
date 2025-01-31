@@ -12,6 +12,7 @@ import com.netanel.xplore.MainActivityViewModel
 import com.netanel.xplore.auth.ui.AuthScreen
 import com.netanel.xplore.home.HomeScreen
 import com.netanel.xplore.quiz.ui.QuizScreen
+
 @Composable
 fun NavigationStack(viewModel: MainActivityViewModel = hiltViewModel()) {
     val navController = rememberNavController()
@@ -19,11 +20,14 @@ fun NavigationStack(viewModel: MainActivityViewModel = hiltViewModel()) {
     val isLoggedInState = viewModel.isUserLoggedInFlow.collectAsState()
     val isLoggedIn = isLoggedInState.value
 
-    NavHost(navController = navController, startDestination = if (isLoggedIn) Screen.HomeScreen.route else Screen.AuthScreen.route) {
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) "${Screen.HomeScreen.route}/{userId}" else Screen.AuthScreen.route
+    ) {
         composable(route = Screen.AuthScreen.route) {
             AuthScreen(
-                onLoginSuccess = {
-                    navController.navigate(Screen.HomeScreen.route) {
+                onLoginSuccess = { userId ->
+                    navController.navigate("${Screen.HomeScreen.route}/$userId") {
                         popUpTo(Screen.AuthScreen.route) {
                             inclusive = true
                         }
@@ -32,17 +36,25 @@ fun NavigationStack(viewModel: MainActivityViewModel = hiltViewModel()) {
             )
         }
 
-        composable(route = Screen.HomeScreen.route) {
+        composable(
+            route = "${Screen.HomeScreen.route}/{userId}",
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
             HomeScreen(
+                userId = userId,
                 onQuizSelected = { quizId ->
-                    navController.navigate(Screen.QuizScreen.route)
+                    navController.navigate("${Screen.QuizScreen.route}/$quizId")
                 }
             )
         }
 
-        composable(route = Screen.QuizScreen.route) { backStackEntry ->
+        composable(
+            route = "${Screen.QuizScreen.route}/{quizId}",
+            arguments = listOf(navArgument("quizId") { type = NavType.StringType })
+        ) { backStackEntry ->
             val quizId = backStackEntry.arguments?.getString("quizId") ?: ""
-            QuizScreen(quizId)
+            QuizScreen(quizId = quizId)
         }
     }
 }

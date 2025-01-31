@@ -43,7 +43,7 @@ import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthViewModel.AuthState
 import com.netanel.xplore.utils.Logger
 @Composable
-fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
+fun AuthScreen(onLoginSuccess: (String?) -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
     val phoneNumber by viewModel.phoneNumber
     val authState by viewModel.authState
     val snackbarHostState = viewModel.snackbarHostState
@@ -109,8 +109,10 @@ fun AuthScreen(onLoginSuccess: () -> Unit, viewModel: AuthViewModel = hiltViewMo
                         is AuthState.VerificationCompleted -> {
                             // Trigger navigation to HomeScreen and reset state
                             LaunchedEffect(Unit) {
-                                viewModel.resetAuthState() // Optional: Prevent triggering multiple times
-                                onLoginSuccess()
+                                val userId = (authState as AuthState.VerificationCompleted).user.id
+
+                                onLoginSuccess(userId)
+                                viewModel.resetAuthState()
                             }
                         }
                         is AuthState.Error -> {

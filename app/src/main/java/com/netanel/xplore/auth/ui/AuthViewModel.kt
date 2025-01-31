@@ -58,6 +58,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun saveUserDetails(user: User) {
+        // Here need to save userId
         sharedPreferencesManager.saveString(SharedPrefKeys.PHONE_NUMBER, user.phoneNumber)
         sharedPreferencesManager.saveString(SharedPrefKeys.USER_NAME, user.name)
         sharedPreferencesManager.saveBoolean(SharedPrefKeys.IS_LOGGED_IN, true)
