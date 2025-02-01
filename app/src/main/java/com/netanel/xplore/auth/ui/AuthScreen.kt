@@ -41,12 +41,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthViewModel.AuthState
-import com.netanel.xplore.utils.Logger
+import com.netanel.xplore.localDatabase.user.converters.toEntity
+import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
+
 @Composable
-fun AuthScreen(onLoginSuccess: (String?) -> Unit, viewModel: AuthViewModel = hiltViewModel()) {
-    val phoneNumber by viewModel.phoneNumber
-    val authState by viewModel.authState
-    val snackbarHostState = viewModel.snackbarHostState
+fun AuthScreen(onLoginSuccess: (String?) -> Unit, authViewModel: AuthViewModel = hiltViewModel(), userViewModel: UserViewModel = hiltViewModel()) {
+    val phoneNumber by authViewModel.phoneNumber
+    val authState by authViewModel.authState
+    val snackbarHostState = authViewModel.snackbarHostState
     val context = LocalContext.current
 
     Scaffold(
@@ -107,12 +109,11 @@ fun AuthScreen(onLoginSuccess: (String?) -> Unit, viewModel: AuthViewModel = hil
                             LoadingAnimation()
                         }
                         is AuthState.VerificationCompleted -> {
-                            // Trigger navigation to HomeScreen and reset state
                             LaunchedEffect(Unit) {
-                                val userId = (authState as AuthState.VerificationCompleted).user.id
-
-                                onLoginSuccess(userId)
-                                viewModel.resetAuthState()
+                                val user = (authState as AuthState.VerificationCompleted).user
+                                userViewModel.saveUser(user)
+                                onLoginSuccess(user.id)
+                                authViewModel.resetAuthState()
                             }
                         }
                         is AuthState.Error -> {
@@ -123,7 +124,7 @@ fun AuthScreen(onLoginSuccess: (String?) -> Unit, viewModel: AuthViewModel = hil
 
                             // Retry Button
                             Button(
-                                onClick = { viewModel.resetAuthState() },
+                                onClick = { authViewModel.resetAuthState() },
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
@@ -140,7 +141,7 @@ fun AuthScreen(onLoginSuccess: (String?) -> Unit, viewModel: AuthViewModel = hil
                             )
                             OutlinedTextField(
                                 value = phoneNumber,
-                                onValueChange = { viewModel.phoneNumber.value = it },
+                                onValueChange = { authViewModel.phoneNumber.value = it },
                                 label = { Text(stringResource(R.string.what_is_your_number)) },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -148,7 +149,7 @@ fun AuthScreen(onLoginSuccess: (String?) -> Unit, viewModel: AuthViewModel = hil
                                 shape = RoundedCornerShape(8.dp)
                             )
                             Button(
-                                onClick = { viewModel.startUserVerification(context) },
+                                onClick = { authViewModel.startUserVerification() },
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp)
                             ) {

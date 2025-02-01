@@ -1,7 +1,7 @@
 package com.netanel.xplore.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,19 +30,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.netanel.xplore.quiz.model.Quiz
-import com.netanel.xplore.quiz.ui.composables.LoadingScreen
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.repository.model.User
+import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
+
 @Composable
 fun HomeScreen(
     userId: String,
-    onQuizSelected: (String, String) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    onQuizSelected: (String) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
     val quizList by viewModel.quizList.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
+    /*val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()*/
 
     var isPopupOpen by remember { mutableStateOf(false) }
 
@@ -50,26 +51,29 @@ fun HomeScreen(
         viewModel.fetchQuizzes(userId)
     }
 
-    if (isLoading) {
-        LoadingScreen()
-        return
-    }
-
-    if (errorMessage != null) {
-        return
-    }
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        contentAlignment = Alignment.Center
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(
             onClick = { isPopupOpen = true },
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text(stringResource(id = R.string.select_quiz))
+            Text("Select Quiz")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                userViewModel.logout()
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Logout")
         }
 
         if (isPopupOpen) {
@@ -77,14 +81,13 @@ fun HomeScreen(
                 quizzes = quizList.orEmpty(),
                 onQuizSelected = { quizId ->
                     isPopupOpen = false
-                    onQuizSelected(userId, quizId)
+                    onQuizSelected(quizId)
                 },
                 onClose = { isPopupOpen = false }
             )
         }
     }
 }
-
 
 @Composable
 fun QuizListPopup(
