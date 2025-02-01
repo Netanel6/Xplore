@@ -3,6 +3,7 @@ package com.netanel.xplore.auth.repository
 import com.netanel.xplore.auth.repository.data.UserApi
 import com.netanel.xplore.auth.repository.model.User
 import com.netanel.xplore.localDatabase.user.converters.toDomain
+import com.netanel.xplore.localDatabase.user.converters.toEntity
 import com.netanel.xplore.localDatabase.user.dao.UserDao
 import com.netanel.xplore.localDatabase.user.model.UserEntity
 import kotlinx.coroutines.Dispatchers
@@ -24,16 +25,5 @@ class AuthRepositoryImpl(private val api: UserApi, private val userDao: UserDao)
         } else {
             throw Exception(response.message ?: "Unknown error")
         }
-    }
-
-    override suspend fun insertUser(user: UserEntity) = withContext(Dispatchers.IO) {
-        userDao.insertUser(user)
-    }
-
-
-    override suspend fun getUser(userId: String): Flow<User?> {
-        return userDao.getUserById(userId)?.let { entity ->
-            flowOf(entity.toDomain())
-        } ?: flowOf(null)
     }
 }

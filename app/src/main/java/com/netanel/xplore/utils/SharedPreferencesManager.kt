@@ -38,8 +38,14 @@ class SharedPreferencesManager @Inject constructor(context: Context) {
     fun getInt(key: String, defaultValue: Int = 0): Int {
         return sharedPreferences.getInt(key, defaultValue)
     }
+
+    fun clearSession() {
+        sharedPreferences.edit().clear().apply()
+    }
 }
+
 
 object SharedPrefKeys {
     const val TOKEN = "token"
+    const val USER_ID = "user_id"
 }

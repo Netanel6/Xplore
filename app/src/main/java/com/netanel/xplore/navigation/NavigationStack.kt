@@ -11,21 +11,30 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.netanel.xplore.auth.ui.AuthScreen
+import com.netanel.xplore.auth.ui.AuthViewModel
 import com.netanel.xplore.home.HomeScreen
+import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 
 import com.netanel.xplore.quiz.ui.QuizScreen
-
-
 @Composable
-fun NavigationStack() {
+fun NavigationStack(
+    viewModel: AuthViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
-    // TODO: Fix logic on boolean to get to home screen when logged it
-    val isLoggedIn = false
+    val user by userViewModel.userFlow.collectAsState(initial = null)
+    val isLoggedIn = user != null
+
+    // Load user session when the app starts
+    LaunchedEffect(Unit) {
+        userViewModel.loadUserFromStorage()
+    }
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn)"${Screen.HomeScreen.route}/{userId}" else Screen.AuthScreen.route
+        startDestination = if (isLoggedIn) "${Screen.HomeScreen.route}/{userId}" else Screen.AuthScreen.route
     ) {
+        /** 🔹 Auth Screen */
         composable(route = Screen.AuthScreen.route) {
             AuthScreen(
                 onLoginSuccess = { userId ->
@@ -36,26 +45,29 @@ fun NavigationStack() {
             )
         }
 
+        /** 🔹 Home Screen */
         composable(
             route = "${Screen.HomeScreen.route}/{userId}",
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")
+            val userId = backStackEntry.arguments?.getString("userId") ?: user?.id ?: ""
 
-            if (userId?.isNotEmpty() == true) {
+            if (userId.isNotEmpty()) {
                 HomeScreen(
                     userId = userId,
-                    onQuizSelected = { _userId, quizId ->
-                        navController.navigate("${Screen.QuizScreen.route}/$_userId/$quizId")
+                    onQuizSelected = { quizId ->
+                        navController.navigate("${Screen.QuizScreen.route}/$userId/$quizId")
                     }
                 )
             } else {
+                // Redirect to login if no user ID is found
                 navController.navigate(Screen.AuthScreen.route) {
-                    popUpTo(Screen. HomeScreen.route) { inclusive = true }
+                    popUpTo(Screen.HomeScreen.route) { inclusive = true }
                 }
             }
         }
 
+        /** 🔹 Quiz Screen */
         composable(
             route = "${Screen.QuizScreen.route}/{userId}/{quizId}",
             arguments = listOf(

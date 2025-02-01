@@ -11,6 +11,4 @@ import kotlinx.coroutines.flow.Flow
  */
 interface AuthRepository {
     suspend fun loginByPhoneNumber(phoneNumber: String): User?
-    suspend fun insertUser(user: UserEntity)
-    suspend fun getUser(userId: String): Flow<User?>
 }
