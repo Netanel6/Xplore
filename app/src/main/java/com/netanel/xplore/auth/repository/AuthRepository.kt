@@ -1,6 +1,8 @@
 package com.netanel.xplore.auth.repository
 
 import com.netanel.xplore.auth.repository.model.User
+import com.netanel.xplore.localDatabase.user.model.UserEntity
+import kotlinx.coroutines.flow.Flow
 
 
 /**
@@ -8,5 +10,7 @@ import com.netanel.xplore.auth.repository.model.User
  * NetanelCA2@gmail.com
  */
 interface AuthRepository {
-    suspend fun getUser(phoneNumber: String): User
+    suspend fun loginByPhoneNumber(phoneNumber: String): User?
+    suspend fun insertUser(user: UserEntity)
+    suspend fun getUser(userId: String): Flow<User?>
 }

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.repository.AuthRepository
 import com.netanel.xplore.auth.repository.model.User
+import com.netanel.xplore.localDatabase.user.converters.toEntity
 import com.netanel.xplore.utils.SharedPrefKeys
 import com.netanel.xplore.utils.SharedPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,51 +26,26 @@ class AuthViewModel @Inject constructor(
 
     var phoneNumber = mutableStateOf("")
     var name = mutableStateOf("")
-    var selectedQuizId = mutableStateOf("") // New property for selected quiz ID
     val snackbarHostState = SnackbarHostState()
     var authState = mutableStateOf<AuthState>(AuthState.Idle)
         private set
-
-    init {
-        // Initialize selectedQuizId with the saved value from SharedPreferences
-        selectedQuizId.value = sharedPreferencesManager.getString(SharedPrefKeys.QUIZ_ID)
-    }
 
     fun startUserVerification(context: Context) {
         authState.value = AuthState.Loading
         viewModelScope.launch {
             try {
-                val user = authRepository.getUser(phoneNumber.value)
+                val user = authRepository.loginByPhoneNumber(phoneNumber.value)
 
                 if (user != null) {
-                    saveUserDetails(user)
+                    authRepository.insertUser(user.toEntity())
+                    sharedPreferencesManager.saveString(SharedPrefKeys.TOKEN, user.token)
                     authState.value = AuthState.VerificationCompleted(user)
-                } else {
-                    val errorMessage = context.getString(R.string.phone_num_incorrect)
-                    authState.value = AuthState.Error(errorMessage)
-                    snackbarHostState.showSnackbar(errorMessage)
                 }
             } catch (e: Exception) {
-                val errorMessage = e.message.toString()
+                val errorMessage = context.getString(R.string.phone_num_incorrect)
                 authState.value = AuthState.Error(errorMessage)
-                snackbarHostState.showSnackbar(errorMessage)
             }
         }
-    }
-
-    private fun saveUserDetails(user: User) {
-        // Here need to save userId
-        sharedPreferencesManager.saveString(SharedPrefKeys.PHONE_NUMBER, user.phoneNumber)
-        sharedPreferencesManager.saveString(SharedPrefKeys.USER_NAME, user.name)
-        sharedPreferencesManager.saveBoolean(SharedPrefKeys.IS_LOGGED_IN, true)
-        sharedPreferencesManager.saveString(SharedPrefKeys.TOKEN, user.token)
-        val initialQuizId = user.quizzes.getOrNull(0)?.id.orEmpty()
-        saveSelectedQuizId(initialQuizId)
-    }
-
-    fun saveSelectedQuizId(quizId: String) {
-        sharedPreferencesManager.saveString(SharedPrefKeys.QUIZ_ID, quizId)
-        selectedQuizId.value = quizId
     }
 
     fun resetAuthState() {
@@ -82,7 +58,6 @@ class AuthViewModel @Inject constructor(
         data object Idle : AuthState()
         data object Loading : AuthState()
         data class VerificationCompleted(val user: User) : AuthState()
-        data object SignInSuccess : AuthState()
         data class Error(val message: String) : AuthState()
     }
 }

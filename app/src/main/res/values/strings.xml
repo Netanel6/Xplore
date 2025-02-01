@@ -5,7 +5,7 @@
     <string name="to_login_write_phone_number">להתחברות יש לרשום את מספר הטלפון</string>
     <string name="what_is_your_number">מה מספר הטלפון שלך?</string>
     <string name="next_step">שלב הבא</string>
-    <string name="phone_num_incorrect">🫢 נראה שמספר הטלפון שרשמת לא נכון 🫢</string>
+    <string name="phone_num_incorrect">🫢 נראה שמספר הטלפון שרשמת לא נכון</string>
     <string name="loading">טוען</string>
     <string name="welcome_back">ברוך הבא, %1$s!</string>
     <string name="continue_to_dashboard">בוא נשחק!</string>

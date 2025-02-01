@@ -34,11 +34,10 @@ import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.ui.composables.LoadingScreen
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.repository.model.User
-
 @Composable
 fun HomeScreen(
     userId: String,
-    onQuizSelected: (String) -> Unit,
+    onQuizSelected: (String, String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val quizList by viewModel.quizList.collectAsState()
@@ -57,12 +56,6 @@ fun HomeScreen(
     }
 
     if (errorMessage != null) {
-        /*Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(stringResource(id = R.string.generic_error, errorMessage))
-        }*/
         return
     }
 
@@ -84,13 +77,14 @@ fun HomeScreen(
                 quizzes = quizList.orEmpty(),
                 onQuizSelected = { quizId ->
                     isPopupOpen = false
-                    onQuizSelected(quizId)
+                    onQuizSelected(userId, quizId)
                 },
                 onClose = { isPopupOpen = false }
             )
         }
     }
 }
+
 
 @Composable
 fun QuizListPopup(
