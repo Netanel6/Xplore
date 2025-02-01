@@ -3,6 +3,7 @@ package com.netanel.xplore.auth.di
 import com.netanel.xplore.auth.repository.AuthRepository
 import com.netanel.xplore.auth.repository.AuthRepositoryImpl
 import com.netanel.xplore.auth.repository.data.UserApi
+import com.netanel.xplore.localDatabase.user.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +28,7 @@ object UserModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(userApi: UserApi): AuthRepository {
-        return AuthRepositoryImpl(userApi)
+    fun provideAuthRepository(userApi: UserApi, userDao: UserDao): AuthRepository {
+        return AuthRepositoryImpl(userApi, userDao)
     }
 }

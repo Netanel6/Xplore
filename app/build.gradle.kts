@@ -78,32 +78,38 @@ android {
 }
 
 dependencies {
+    // Core AndroidX dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.firebase.firestore.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Hilt dependencies
+    // AppCompat
+    implementation(libs.androidx.appcompat)
+
+    // Firebase
+    implementation(platform(libs.firebaseBom))
+    implementation(libs.firebaseAnalytics)
+    implementation(libs.firebaseCrashlytics)
+    implementation(libs.firebaseAuth)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebaseStorage)
+    implementation(libs.playServicesAuth)
+
+    // Hilt Dependency Injection
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
     // Hilt Navigation for Compose
     implementation(libs.hilt.navigation.compose)
 
-    // Kotlinx Serialization dependency
+    // Kotlin Serialization
     implementation(libs.kotlinx.serialization.json)
 
     // Lottie animation library
@@ -113,17 +119,25 @@ dependencies {
     implementation(libs.glide)
     kapt(libs.glide.compiler)
 
-    // Firebase
-    implementation(platform(libs.firebaseBom))
-    implementation(libs.firebaseAnalytics)
-    implementation(libs.firebaseCrashlytics)
-    implementation(libs.firebaseAuth)
-    implementation(libs.playServicesAuth)
-    implementation(libs.firebaseStorage)
-
-    // Retrofit + OKHttp
+    // Retrofit + OKHttp for Networking
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+
+    // Room Database (Newly Added)
+    implementation(libs.room.runtime)
+    kapt(libs.room.compiler)
+    implementation(libs.room.ktx)
+
+    // Testing Dependencies
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Debugging Tools
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }

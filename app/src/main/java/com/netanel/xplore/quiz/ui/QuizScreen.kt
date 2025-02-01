@@ -13,9 +13,9 @@ import com.netanel.xplore.quiz.ui.composables.LoadingScreen
 import com.netanel.xplore.quiz.ui.composables.PointsAnimationScreen
 import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
 import com.netanel.xplore.quiz.ui.composables.QuizQuestion
-
 @Composable
 fun QuizScreen(
+    userId: String,
     quizId: String,
     viewModel: QuizViewModel = hiltViewModel()
 ) {
@@ -84,11 +84,9 @@ fun QuizScreen(
             },
             onNextClicked = {
                 if (selectedAnswer != null) {
-                    // Lock the question and save its state
                     answerStates[currentQuestionIndex] = selectedAnswer to true
                     isAnswerLocked = true
 
-                    // Only show animation and add score if the question is not already scored
                     if (currentQuestionIndex !in scoredQuestions) {
                         isCorrect = selectedAnswer == currentQuestion.correctAnswerIndex
                         pointsGained = if (isCorrect) currentQuestion.points else 0
@@ -98,7 +96,6 @@ fun QuizScreen(
                         scoredQuestions.add(currentQuestionIndex)
                         showAnimation = true
                     } else {
-                        // Skip animation if already answered
                         currentQuestionIndex++
                         selectedAnswer = null
                         isAnswerLocked = false
@@ -107,7 +104,6 @@ fun QuizScreen(
             },
             onPreviousClicked = {
                 if (currentQuestionIndex > 0) {
-                    // Save the current question's state before moving back
                     answerStates[currentQuestionIndex] = selectedAnswer to isAnswerLocked
                     currentQuestionIndex--
                 }
