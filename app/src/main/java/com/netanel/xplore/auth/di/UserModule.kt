@@ -28,7 +28,7 @@ object UserModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(userApi: UserApi, userDao: UserDao): AuthRepository {
-        return AuthRepositoryImpl(userApi, userDao)
+    fun provideAuthRepository(userApi: UserApi): AuthRepository {
+        return AuthRepositoryImpl(userApi)
     }
 }

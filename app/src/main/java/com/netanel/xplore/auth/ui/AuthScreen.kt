@@ -1,22 +1,23 @@
 package com.netanel.xplore.auth.ui
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -24,169 +25,155 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthViewModel.AuthState
-import com.netanel.xplore.localDatabase.user.converters.toEntity
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
+import kotlinx.coroutines.delay
 
 @Composable
-fun AuthScreen(onLoginSuccess: (String?) -> Unit, authViewModel: AuthViewModel = hiltViewModel(), userViewModel: UserViewModel = hiltViewModel()) {
-    val phoneNumber by authViewModel.phoneNumber
-    val authState by authViewModel.authState
-    val snackbarHostState = authViewModel.snackbarHostState
+fun AuthScreen(
+    onLoginSuccess: (String) -> Unit,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
+    var phoneNumber by remember { mutableStateOf("") }
+    val authState by authViewModel.authState
+    var isLoading by remember { mutableStateOf(false) }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { paddingValues ->
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.VerificationCompleted -> {
+                val user = (authState as AuthState.VerificationCompleted).user
+                delay(1500)
+                userViewModel.saveUser(user)
+                onLoginSuccess(user.id.toString())
+            }
+            is AuthState.Error -> {
+                isLoading = false
+                val errorMessage = (authState as AuthState.Error).message
+                Log.d("AuthScreen", "Error: $errorMessage")
+            }
+            else -> {}
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF0F0F0))
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(24.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Animated logo
             AnimatedVisibility(
-                visible = authState !is AuthState.Loading,
-                enter = fadeIn(animationSpec = tween(800)) + scaleIn(initialScale = 0.8f),
-                exit = fadeOut(animationSpec = tween(400)) + scaleOut(targetScale = 0.8f)
+                visible = authState!is AuthState.Loading,
+                enter = fadeIn(animationSpec = tween(800)) + scaleIn(
+                    initialScale = 0.8f,
+                    animationSpec = tween(800)
+                ),
+                exit = fadeOut(animationSpec = tween(400)) + scaleOut(
+                    targetScale = 0.8f,
+                    animationSpec = tween(400)
+                )
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.app_logo),
                     contentDescription = "App logo",
                     modifier = Modifier
-                        .size(100.dp)
-                        .padding(bottom = 16.dp)
-                )
-            }
-
-            // Title
-            AnimatedVisibility(
-                visible = authState !is AuthState.Loading,
-                enter = slideInVertically(initialOffsetY = { -50 }) + fadeIn(),
-                exit = slideOutVertically(targetOffsetY = { -50 }) + fadeOut()
-            ) {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
             }
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(8.dp),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(6.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    when (authState) {
-                        is AuthState.Loading -> {
-                            LoadingAnimation()
-                        }
-                        is AuthState.VerificationCompleted -> {
-                            LaunchedEffect(Unit) {
-                                val user = (authState as AuthState.VerificationCompleted).user
-                                userViewModel.saveUser(user)
-                                onLoginSuccess(user.id)
-                                authViewModel.resetAuthState()
-                            }
-                        }
-                        is AuthState.Error -> {
-                            val errorMessage = (authState as AuthState.Error).message
-                            ErrorMessage(errorMessage)
+                    AnimatedVisibility(
+                        visible = authState!is AuthState.Loading,
+                        enter = fadeIn(animationSpec = tween(500)),
+                        exit = fadeOut(animationSpec = tween(300))
+                    ) {
+                        OutlinedTextField(
+                            value = phoneNumber,
+                            onValueChange = { phoneNumber = it },
+                            label = { Text(stringResource(R.string.to_login_write_phone_number)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                    }
 
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Retry Button
-                            Button(
-                                onClick = { authViewModel.resetAuthState() },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text(text = stringResource(R.string.retry))
-                            }
+                    Button(
+                        onClick = {
+                            isLoading = true
+                            authViewModel.startUserVerification(phoneNumber)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        enabled = phoneNumber.isNotBlank() && authState!= AuthState.Loading
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Color.White
+                            )
+                        } else {
+                            Text(stringResource(R.string.next_step))
                         }
-                        else -> {
+                    }
+
+                    AnimatedVisibility(
+                        visible = authState is AuthState.Error,
+                        enter = fadeIn(animationSpec = tween(500)),
+                        exit = fadeOut(animationSpec = tween(300))
+                    ) {
+                        val errorMessage = (authState as? AuthState.Error)?.message
+                        if (errorMessage!= null) {
                             Text(
-                                text = stringResource(R.string.to_login_write_phone_number),
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 8.dp),
-                                color = MaterialTheme.colorScheme.primary
+                                text = errorMessage,
+                                color = Color.Red,
+                                style = MaterialTheme.typography.bodyMedium
                             )
-                            OutlinedTextField(
-                                value = phoneNumber,
-                                onValueChange = { authViewModel.phoneNumber.value = it },
-                                label = { Text(stringResource(R.string.what_is_your_number)) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 16.dp),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            Button(
-                                onClick = { authViewModel.startUserVerification() },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text(text = stringResource(R.string.next_step))
-                            }
                         }
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun LoadingAnimation() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        CircularProgressIndicator(
-            modifier = Modifier
-                .size(50.dp)
-                .padding(bottom = 16.dp),
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = stringResource(R.string.loading),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.secondary
-        )
-    }
-}
-
-@Composable
-fun ErrorMessage(message: String) {
-    Text(
-        text = message,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colorScheme.error
-    )
 }

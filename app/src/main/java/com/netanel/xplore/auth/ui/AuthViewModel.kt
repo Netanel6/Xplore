@@ -1,5 +1,6 @@
 package com.netanel.xplore.auth.ui
 
+import android.content.Context
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableStateOf
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,26 +29,20 @@ class AuthViewModel @Inject constructor(
 
     var phoneNumber = mutableStateOf("")
     val authState = mutableStateOf<AuthState>(AuthState.Idle)
-    val snackbarHostState = SnackbarHostState()
 
-    fun startUserVerification() {
+    fun startUserVerification(phoneNumber: String) {
         authState.value = AuthState.Loading
         viewModelScope.launch {
             try {
-                val user = authRepository.loginByPhoneNumber(phoneNumber.value)
-                if (user != null) {
-                    sharedPreferencesManager.saveString(SharedPrefKeys.TOKEN, user.token) // ✅ Save token
+                val user = authRepository.loginByPhoneNumber(phoneNumber)
+                if (user!= null) {
+                    sharedPreferencesManager.saveString(SharedPrefKeys.TOKEN, user.token)
                     authState.value = AuthState.VerificationCompleted(user)
                 }
             } catch (e: Exception) {
                 authState.value = AuthState.Error("Phone number incorrect")
             }
         }
-    }
-
-    fun resetAuthState() {
-        authState.value = AuthState.Idle
-        phoneNumber.value = ""
     }
 
     sealed class AuthState {
