@@ -157,8 +157,8 @@ fun HomeScreen(
             // Quiz list section
             AnimatedComposable(
                 isVisible = showQuizList,
-                enter = expandVertically(animationSpec = tween(300), expandFrom = Alignment.Top),
-                exit = shrinkVertically(animationSpec = tween(300), shrinkTowards = Alignment.Bottom),
+                enter = expandVertically(animationSpec = tween(500), expandFrom = Alignment.Top),
+                exit = shrinkVertically(animationSpec = tween(500), shrinkTowards = Alignment.Top),
                 content = {
                     QuizList(
                         quizzes = quizList.orEmpty(),
