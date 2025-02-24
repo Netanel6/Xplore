@@ -35,6 +35,7 @@ fun NavigationStack(
         /** 🔹 Auth Screen */
         composable(route = Screen.AuthScreen.route) {
             AuthScreen(
+                userViewModel = userViewModel,
                 onLoginSuccess = { userId ->
                     navController.navigate("${Screen.HomeScreen.route}/$userId") {
                         popUpTo(Screen.AuthScreen.route) { inclusive = true }

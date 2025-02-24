@@ -11,13 +11,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.navigation.NavigationStack
 import com.netanel.xplore.ui.theme.XploreTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,7 +51,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen() {
+fun MainScreen(userViewModel: UserViewModel = hiltViewModel()) {
     Scaffold(
         topBar = { MainTopAppBar() },
     ) { paddingValues ->
@@ -53,7 +60,7 @@ fun MainScreen() {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            NavigationStack()
+            NavigationStack(userViewModel = userViewModel)
         }
     }
 }
@@ -61,8 +68,13 @@ fun MainScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopAppBar() {
+
     TopAppBar(
-        title = { Text("לורם איפסום") },
-        navigationIcon = { Icon(Icons.Default.Build, contentDescription = "Menu Icon") }
+        title = { Text(stringResource(R.string.app_name)) },
+        navigationIcon = { Icon(Icons.Outlined.AccountBox, contentDescription = "Menu Icon") },
+        colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary
+        )
     )
 }
