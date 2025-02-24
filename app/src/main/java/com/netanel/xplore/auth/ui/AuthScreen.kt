@@ -159,7 +159,7 @@ fun AuthScreen(
                     }
 
                     AnimatedVisibility(
-                        visible = authState is AuthState.Error,
+                        visible = authState is AuthState.Error, // Show error message when authState is Error
                         enter = fadeIn(animationSpec = tween(500)),
                         exit = fadeOut(animationSpec = tween(300))
                     ) {

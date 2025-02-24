@@ -57,10 +57,14 @@ fun NavigationStack(
                     userId = userId,
                     onQuizSelected = { quizId ->
                         navController.navigate("${Screen.QuizScreen.route}/$userId/$quizId")
+                    },
+                    onLogoutClicked = {
+                        navController.navigate(Screen.AuthScreen.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
                     }
                 )
             } else {
-                // Redirect to login if no user ID is found
                 navController.navigate(Screen.AuthScreen.route) {
                     popUpTo(Screen.HomeScreen.route) { inclusive = true }
                 }

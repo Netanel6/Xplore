@@ -1,15 +1,10 @@
 package com.netanel.xplore.auth.ui
 
-import android.content.Context
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.mutableStateOf
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.netanel.xplore.auth.repository.AuthRepository
 import com.netanel.xplore.auth.repository.model.User
-import com.netanel.xplore.localDatabase.user.converters.toEntity
-import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.utils.SharedPrefKeys
 import com.netanel.xplore.utils.SharedPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,9 +33,11 @@ class AuthViewModel @Inject constructor(
                 if (user!= null) {
                     sharedPreferencesManager.saveString(SharedPrefKeys.TOKEN, user.token)
                     authState.value = AuthState.VerificationCompleted(user)
+                } else {
+                    authState.value = AuthState.Error("לא נמצא משתמש לטלפון: $phoneNumber")
                 }
             } catch (e: Exception) {
-                authState.value = AuthState.Error("Phone number incorrect")
+                authState.value = AuthState.Error("Fatal Error: ${e.message}")
             }
         }
     }

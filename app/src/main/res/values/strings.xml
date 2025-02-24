@@ -13,7 +13,8 @@
     <string name="generic_error">שגיאה כללית: %1$s</string>
     <string name="user_not_found">משתמש לא נמצא</string>
     <string name="continue_to_quiz">המשך לשאלון</string>
-    <string name="select_quiz">אנא בחר שאלון</string>
-    <string name="select_quiz_title">Xplore - ברוך הבא ל</string>
+    <string name="select_quiz">בואו נשחק!</string>
+    <string name="select_quiz_title">השאלונים שלי</string>
     <string name="retry">נסה שוב</string>
+    <string name="logout">התנתק</string>
 </resources>
