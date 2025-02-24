@@ -2,8 +2,6 @@ package com.netanel.xplore.home
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,14 +59,14 @@ fun HomeScreen(
     userId: String,
     onQuizSelected: (String) -> Unit,
     onLogoutClicked: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val quizList by viewModel.quizList.collectAsState()
+    val quizList by homeViewModel.quizList.collectAsState()
     var showQuizList by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId) {
-        viewModel.fetchQuizzes(userId)
+        homeViewModel.fetchQuizzes(userId)
     }
 
     Box(
