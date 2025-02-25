@@ -1,8 +1,6 @@
 package com.netanel.xplore.ui.theme
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val Purple40 = Color(0xFF6200EA)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val PurpleGrey40 = Color(0xFF6200EA)
 val Pink80 = Color(0xFFEFB8C8)

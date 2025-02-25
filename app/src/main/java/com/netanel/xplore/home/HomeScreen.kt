@@ -1,5 +1,6 @@
 package com.netanel.xplore.home
 
+
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -15,6 +16,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
@@ -30,8 +33,8 @@ import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.BluePrimary
 import com.netanel.xplore.ui.theme.OnPrimary
+import com.netanel.xplore.ui.theme.Pink40
 import com.netanel.xplore.ui.theme.PurpleGrey40
-import com.netanel.xplore.ui.theme.Purple40
 import com.netanel.xplore.ui.theme.White
 
 @Composable
@@ -70,14 +73,14 @@ fun HomeScreen(
                 Icon(
                     painter = painterResource(R.drawable.question_mark),
                     contentDescription = "Question mark",
-                    tint = BluePrimary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(44.dp)
                 )
                 Text(
                     text = "ברוך הבא, $username",
                     fontWeight = FontWeight.Bold,
                     fontSize = 36.sp,
-                    color = BluePrimary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -121,7 +124,7 @@ fun HomeScreen(
                             .height(56.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Purple40,
+                            containerColor = Pink40,
                             contentColor = OnPrimary
                         )
                     ) {
@@ -149,7 +152,6 @@ fun HomeScreen(
         }
     }
 }
-
 @Composable
 fun QuizList(
     quizzes: List<User.Quiz>,
@@ -162,8 +164,9 @@ fun QuizList(
             .padding(16.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = White
-        )
+            containerColor = Color(0xFFF5F5F5)
+        ),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
@@ -176,26 +179,29 @@ fun QuizList(
                 Text(
                     stringResource(id = R.string.select_quiz_title),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = BluePrimary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 IconButton(onClick = onClose) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
                         contentDescription = "Close",
-                        tint = PurpleGrey40
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
 
+            Divider(color = Color.White, thickness = 1.dp)
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(max = 300.dp)
             ) {
-                items(quizzes) { quiz ->
+                items(quizzes.size, key = { it }) { index ->
+                    val quiz = quizzes[index]
                     QuizListItem(
                         quiz = quiz,
-                        onClick = { onQuizSelected(quiz.id) }
+                        onClick = { onQuizSelected(quiz.id) },
+                        backgroundColor = if (index % 2 == 0) Color.White else Color.Gray
                     )
                 }
             }
@@ -204,28 +210,14 @@ fun QuizList(
 }
 
 @Composable
-fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit) {
-    var isHovered by remember { mutableStateOf(false) }
-
+fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit, backgroundColor: Color) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable(onClick = onClick)
-            .pointerInput(Unit) {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        awaitFirstDown().also {
-                            isHovered = true
-                        }
-                        val up = awaitPointerEvent(PointerEventPass.Final)
-                        if (up.changes.any { it.changedToUp() }) {
-                            isHovered = false
-                        }
-                    }
-                }
-            },
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isHovered) 4.dp else 2.dp),
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
@@ -237,14 +229,16 @@ fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit) {
             Icon(
                 painter = painterResource(id = R.drawable.exclamation_mark),
                 contentDescription = "Quiz icon",
-                tint = PurpleGrey40,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = quiz.title,
-                style = MaterialTheme.typography.bodyLarge.copy(color = BluePrimary)
-            )
+            Column {
+                Text(
+                    text = quiz.title,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                )
+            }
         }
     }
 }
