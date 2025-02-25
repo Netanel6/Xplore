@@ -14,6 +14,7 @@ import com.netanel.xplore.auth.ui.AuthScreen
 import com.netanel.xplore.home.HomeScreen
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.quiz.ui.QuizScreen
+import com.netanel.xplore.ui.SplashScreen
 
 @Composable
 fun NavigationStack(
@@ -21,25 +22,38 @@ fun NavigationStack(
 ) {
     val navController = rememberNavController()
     val user by userViewModel.userFlow.collectAsState(initial = null)
-    val isLoggedIn = user != null
+    val isLoading by userViewModel.isLoading.collectAsState()
 
-    // Load user session when the app starts
     LaunchedEffect(Unit) {
         userViewModel.loadUserFromStorage()
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = if (isLoggedIn) "${Screen.HomeScreen.route}/{userId}" else Screen.AuthScreen.route
-    ) {
+    NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
+        /** 🔹 Splash Screen */
+        composable(Screen.SplashScreen.route) {
+            SplashScreen(isLoggedIn = user != null)
+
+            LaunchedEffect(isLoading, user) {
+                if (!isLoading) {
+                    if (user != null) {
+                        navController.navigate("${Screen.HomeScreen.route}/${user!!.id}") {
+                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(Screen.AuthScreen.route) {
+                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                        }
+                    }
+                }
+            }
+        }
+
         /** 🔹 Auth Screen */
         composable(route = Screen.AuthScreen.route) {
             AuthScreen(
                 userViewModel = userViewModel,
                 onLoginSuccess = { userId ->
-                    navController.navigate("${Screen.HomeScreen.route}/$userId") {
-                        popUpTo(Screen.AuthScreen.route) { inclusive = true }
-                    }
+                    userViewModel.loadUserFromStorage()
                 }
             )
         }
@@ -49,25 +63,25 @@ fun NavigationStack(
             route = "${Screen.HomeScreen.route}/{userId}",
             arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: user?.id ?: ""
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
 
-            if (userId.isNotEmpty()) {
-                HomeScreen(
-                    userId = userId,
-                    onQuizSelected = { quizId ->
-                        navController.navigate("${Screen.QuizScreen.route}/$userId/$quizId")
-                    },
-                    onLogoutClicked = {
-                        navController.navigate(Screen.AuthScreen.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
+            // 🔄 React to login state
+            LaunchedEffect(user) {
+                if (user == null) {
+                    navController.navigate(Screen.AuthScreen.route) {
+                        popUpTo(Screen.HomeScreen.route) { inclusive = true }
                     }
-                )
-            } else {
-                navController.navigate(Screen.AuthScreen.route) {
-                    popUpTo(Screen.HomeScreen.route) { inclusive = true }
                 }
             }
+
+            HomeScreen(
+                userId = userId,
+                userViewModel = userViewModel,
+                onQuizSelected = { quizId ->
+                    navController.navigate("${Screen.QuizScreen.route}/$userId/$quizId")
+                },
+                onLogoutClicked = { userViewModel.logout() }
+            )
         }
 
         /** 🔹 Quiz Screen */
@@ -78,9 +92,19 @@ fun NavigationStack(
                 navArgument("quizId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            val quizId = backStackEntry.arguments?.getString("quizId") ?: ""
-            QuizScreen(userId = userId, quizId = quizId)
+            QuizScreen(
+                userId = backStackEntry.arguments?.getString("userId") ?: "",
+                quizId = backStackEntry.arguments?.getString("quizId") ?: ""
+            )
+        }
+    }
+
+    // 🔹 Ensure Login Navigation Works Immediately
+    LaunchedEffect(user) {
+        if (user != null) {
+            navController.navigate("${Screen.HomeScreen.route}/${user!!.id}") {
+                popUpTo(Screen.AuthScreen.route) { inclusive = true }
+            }
         }
     }
 }

@@ -9,12 +9,11 @@ import com.netanel.xplore.localDatabase.user.model.UserEntity
 import com.netanel.xplore.utils.SharedPrefKeys
 import com.netanel.xplore.utils.SharedPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val userDao: UserDao,
@@ -27,12 +26,13 @@ class UserViewModel @Inject constructor(
     private val _username = MutableStateFlow("Guest")
     val username: StateFlow<String> = _username
 
-    init {
-        loadUserFromStorage()
-    }
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     fun loadUserFromStorage() {
         viewModelScope.launch {
+            _isLoading.value = true
+
             try {
                 val userId = sharedPreferencesManager.getString(SharedPrefKeys.USER_ID)
                 if (userId.isNotEmpty()) {
@@ -42,6 +42,8 @@ class UserViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _username.value = "Guest"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
