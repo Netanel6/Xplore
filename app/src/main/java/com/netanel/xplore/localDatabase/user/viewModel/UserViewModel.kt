@@ -15,27 +15,47 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val userDao: UserDao,
     private val sharedPreferencesManager: SharedPreferencesManager
-): ViewModel() {
+) : ViewModel() {
 
     private val _userFlow = MutableStateFlow<UserEntity?>(null)
     val userFlow: StateFlow<UserEntity?> = _userFlow
 
-    val username: Flow<String> = _userFlow.map { it?.name?: "" }
+    private val _username = MutableStateFlow("Guest")
+    val username: StateFlow<String> = _username
+
+    init {
+        loadUserFromStorage()
+    }
 
     fun loadUserFromStorage() {
         viewModelScope.launch {
             try {
                 val userId = sharedPreferencesManager.getString(SharedPrefKeys.USER_ID)
                 if (userId.isNotEmpty()) {
-                    _userFlow.value = userDao.getUserById(userId)
+                    val user = userDao.getUserById(userId)
+                    _userFlow.value = user
+                    _username.value = user?.name ?: "Guest"
                 }
             } catch (e: Exception) {
-                //TODO: Handle the exception, e.g., log the error or emit an error state
+                _username.value = "Guest"
+            }
+        }
+    }
+
+    fun refreshUserFromDb() {
+        viewModelScope.launch {
+            try {
+                _userFlow.value?.let { currentUser ->
+                    val updatedUser = userDao.getUserById(currentUser.id)
+                    _userFlow.value = updatedUser
+                    _username.value = updatedUser?.name ?: "Guest"
+                }
+            } catch (e: Exception) {
+                _username.value = "Guest"
             }
         }
     }
@@ -45,8 +65,10 @@ class UserViewModel @Inject constructor(
             try {
                 userDao.insertUser(user.toEntity())
                 sharedPreferencesManager.saveString(SharedPrefKeys.USER_ID, user.id.toString())
+                _userFlow.value = user.toEntity()
+                _username.value = user.name
             } catch (e: Exception) {
-                //TODO: Handle the exception, e.g., log the error or emit an error state
+                _username.value = "Guest"
             }
         }
     }
@@ -57,8 +79,9 @@ class UserViewModel @Inject constructor(
                 _userFlow.value?.let { userDao.deleteUser(it) }
                 sharedPreferencesManager.clearSession()
                 _userFlow.value = null
+                _username.value = "Guest"
             } catch (e: Exception) {
-                //TODO: Handle the exception, e.g., log the error or emit an error state
+                _username.value = "Guest"
             }
         }
     }
