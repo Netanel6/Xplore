@@ -1,26 +1,45 @@
 package com.netanel.xplore.home
 
-
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.changedToUp
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,11 +50,9 @@ import com.netanel.xplore.R
 import com.netanel.xplore.auth.repository.model.User
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.ui.AnimatedComposable
-import com.netanel.xplore.ui.theme.BluePrimary
 import com.netanel.xplore.ui.theme.OnPrimary
-import com.netanel.xplore.ui.theme.Pink40
-import com.netanel.xplore.ui.theme.PurpleGrey40
-import com.netanel.xplore.ui.theme.White
+import com.netanel.xplore.ui.theme.SoftWhite
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -46,11 +63,15 @@ fun HomeScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val quizList by homeViewModel.quizList.collectAsState()
-    var showQuizList by remember { mutableStateOf(false) }
     val username by userViewModel.username.collectAsState(initial = "")
+    var showQuizList by remember { mutableStateOf(false) }
+    var isUiVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(userId) {
+    // 🌟 Fade-in Animation
+    LaunchedEffect(Unit) {
         homeViewModel.fetchQuizzes(userId)
+        delay(300)
+        isUiVisible = true
     }
 
     Box(
@@ -65,26 +86,24 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title Section
-            Column(
-                modifier = Modifier.padding(bottom = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.question_mark),
-                    contentDescription = "Question mark",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(44.dp)
-                )
-                Text(
-                    text = "ברוך הבא, $username",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 36.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            // 🔹 Welcome Text
+            AnimatedComposable(
+                isVisible = isUiVisible,
+                enter = fadeIn(animationSpec = tween(1000)),
+                content = {
+                    Text(
+                        text = stringResource(R.string.welcome_back, username),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = OnPrimary,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            )
 
-            // "Select Quiz" Button
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 🏆 Select Quiz Button
             AnimatedComposable(
                 isVisible = !showQuizList,
                 enter = expandVertically(animationSpec = tween(500)),
@@ -97,8 +116,8 @@ fun HomeScreen(
                             .height(56.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = BluePrimary,
-                            contentColor = OnPrimary
+                            containerColor = OnPrimary,
+                            contentColor = SoftWhite
                         )
                     ) {
                         Text(stringResource(R.string.select_quiz))
@@ -108,24 +127,21 @@ fun HomeScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // "Logout" Button
+            // 🚪 Logout Button
             AnimatedComposable(
                 isVisible = !showQuizList,
                 enter = expandVertically(animationSpec = tween(500)),
                 exit = shrinkVertically(animationSpec = tween(500)),
                 content = {
                     Button(
-                        onClick = {
-                            userViewModel.logout()
-                            onLogoutClicked()
-                        },
+                        onClick = { onLogoutClicked() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Pink40,
-                            contentColor = OnPrimary
+                            containerColor = OnPrimary,
+                            contentColor = SoftWhite
                         )
                     ) {
                         Text(stringResource(R.string.logout))
@@ -133,7 +149,9 @@ fun HomeScreen(
                 }
             )
 
-            // Quiz List Section
+            Spacer(Modifier.height(20.dp))
+
+            // 🎮 Quiz List
             AnimatedComposable(
                 isVisible = showQuizList,
                 enter = expandVertically(animationSpec = tween(500)),
@@ -152,6 +170,7 @@ fun HomeScreen(
         }
     }
 }
+
 @Composable
 fun QuizList(
     quizzes: List<User.Quiz>,
@@ -161,12 +180,10 @@ fun QuizList(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F5F5)
-        ),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .padding(16.dp)
+            .shadow(8.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
@@ -179,18 +196,19 @@ fun QuizList(
                 Text(
                     stringResource(id = R.string.select_quiz_title),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary
+                    color = OnPrimary
                 )
                 IconButton(onClick = onClose) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
                         contentDescription = "Close",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = OnPrimary
                     )
                 }
             }
 
-            Divider(color = Color.White, thickness = 1.dp)
+            Divider(color = MaterialTheme.colorScheme.onPrimary, thickness = 1.dp)
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,7 +219,7 @@ fun QuizList(
                     QuizListItem(
                         quiz = quiz,
                         onClick = { onQuizSelected(quiz.id) },
-                        backgroundColor = if (index % 2 == 0) Color.White else Color.Gray
+                        backgroundColor = if (index % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
             }
@@ -217,7 +235,7 @@ fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit, backgroundColor: Color) {
             .padding(vertical = 4.dp)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
@@ -229,14 +247,14 @@ fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit, backgroundColor: Color) {
             Icon(
                 painter = painterResource(id = R.drawable.question_mark),
                 contentDescription = "Quiz icon",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = OnPrimary,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(
                     text = quiz.title,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                    style = MaterialTheme.typography.bodyLarge.copy(color = OnPrimary)
                 )
             }
         }

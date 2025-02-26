@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.netanel.xplore.ui.theme.OnPrimary
 
 @Composable
 fun QuestionNumberDisplay(currentQuestionNumber: Int, totalQuestions: Int) {
@@ -19,7 +20,7 @@ fun QuestionNumberDisplay(currentQuestionNumber: Int, totalQuestions: Int) {
         modifier = Modifier
             .padding(8.dp)
             .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = OnPrimary,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(horizontal = 12.dp, vertical = 6.dp),

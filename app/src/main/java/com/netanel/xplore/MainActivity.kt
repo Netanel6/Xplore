@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.navigation.NavigationStack
+import com.netanel.xplore.ui.theme.OnPrimary
 import com.netanel.xplore.ui.theme.XploreTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -75,7 +76,7 @@ fun MainTopAppBar() {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = OnPrimary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary
         )
     )

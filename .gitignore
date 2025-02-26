@@ -7,7 +7,7 @@
 /.idea/assetWizardSettings.xml
 /.idea/deploymentTargetSelector.xml
 /.idea/misc.xml
-/.idea/appInsightsSettings.xml
+.idea/appInsightsSettings.xml
 /.idea/runConfigurations.xml
 /.idea/inspectionProfiles/Project_Default.xml
 
@@ -23,6 +23,6 @@
 /local.properties
 gradle/wrapper/gradle-wrapper.properties
 
-
+keystore.properties
 app/keys/XploreKey
 app/keys/xplore signed apk info.rtf

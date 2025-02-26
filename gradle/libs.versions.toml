@@ -42,6 +42,9 @@ okhttp = "4.11.0"
 
 # Room Database
 room = "2.6.1"
+# Confetti
+konfetti = "2.0.2"
+
 
 [libraries]
 # Core
@@ -99,6 +102,9 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+# Confetti
+konfetti-compose = { module = "nl.dionsegijn:konfetti-compose", version.ref = "konfetti" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
