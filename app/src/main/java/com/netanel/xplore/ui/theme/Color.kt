@@ -22,12 +22,12 @@ val OnSecondary = Color(0xFF000000)
 
 // 🎨 Custom Gradient Colors (Used in Quiz Screens)
 // 🎨 Quiz Background Gradient Colors
-val GradientStart = Color(0xFF6A11CB) // Purple to Blue Gradient Start
-val GradientMid = Color(0xFF2575FC)   // Blue Gradient Middle
-val GradientEnd = Color(0xFF4285F4)   // Blue Gradient End
-val CardBackground = Color(0xFFFFFFFF)
+val GradientStart = Color(0xFF6A11CB)
+val GradientMid = Color(0xFF2575FC)
+val GradientEnd = Color(0xFF4285F4)
 
 // 🎨 Answer Colors
 val AnswerSelected = Color(0xFF655BFF)
+val AnswerLocked = Color(0xFFB00020)
 val AnswerUnselected = Color(0xFFE0E0E0)
 val AnswerBorder = Color(0xFFB0BEC5)

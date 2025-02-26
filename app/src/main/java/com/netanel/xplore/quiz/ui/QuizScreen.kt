@@ -66,8 +66,8 @@ fun QuizScreen(
                         totalScore = quiz.totalScore,
                         onTryAgain = {
                             // TODO: Show Popup before resetting (create dynamic one)
-                            /*viewModel.resetQuiz()
-                            viewModel.loadQuiz(quizId)*/
+                            viewModel.resetQuiz()
+                            viewModel.loadQuiz(quizId)
                         },
                         onGoHome = { /* Navigate Home */ }
                     )
