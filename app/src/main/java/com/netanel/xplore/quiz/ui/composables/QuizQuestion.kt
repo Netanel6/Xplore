@@ -33,10 +33,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.netanel.xplore.R
 import com.netanel.xplore.quiz.model.Question
+import com.netanel.xplore.ui.theme.AnswerBorder
+import com.netanel.xplore.ui.theme.AnswerSelected
+import com.netanel.xplore.ui.theme.AnswerUnselected
+import com.netanel.xplore.ui.theme.CardBackground
 
 @Composable
 fun QuizQuestion(
@@ -64,13 +70,13 @@ fun QuizQuestion(
             IconButton(onClick = { onPreviousClicked() }) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Previous",
+                    contentDescription = stringResource(R.string.previous_question),
                     tint = Color.White
                 )
             }
 
             Text(
-                text = "01:14",
+                text = stringResource(R.string.quiz_timer),
                 color = Color.White,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
@@ -80,7 +86,7 @@ fun QuizQuestion(
                 onClick = { onNextClicked() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
             ) {
-                Text("Submit", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.submit), color = MaterialTheme.colorScheme.primary)
             }
         }
 
@@ -114,12 +120,12 @@ fun QuizQuestion(
                 .fillMaxWidth()
                 .padding(8.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = CardBackground),
             elevation = CardDefaults.cardElevation(6.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "$currentQuestionNumber.",
+                    text = stringResource(R.string.question_number, currentQuestionNumber, totalQuestions),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -152,16 +158,10 @@ fun QuizQuestion(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = when {
-                            isSelected -> Color(0xFF655BFF)
-                            else -> Color.White.copy(alpha = 0.9f)
-                        },
-                        contentColor = when {
-                            isSelected -> Color.White
-                            else -> MaterialTheme.colorScheme.primary
-                        }
+                        containerColor = if (isSelected) AnswerSelected else AnswerUnselected,
+                        contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.primary
                     ),
-                    border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
+                    border = if (!isSelected) BorderStroke(1.dp, AnswerBorder) else null
                 ) {
                     Text(
                         text = answer,

@@ -2,7 +2,6 @@ package com.netanel.xplore.quiz.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.repository.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -86,4 +85,21 @@ class QuizViewModel @Inject constructor(
             _quizState.value = QuizState.Loaded(currentQuiz!!)
         }
     }
+
+    fun resetQuiz() {
+        val quizId = currentQuiz?._id ?: return
+
+        viewModelScope.launch {
+            _quizState.value = QuizState.Loading
+            try {
+                val reloadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0)
+                currentQuiz = reloadedQuiz
+                _currentQuestionIndex.value = 0
+                _quizState.value = QuizState.Loaded(currentQuiz!!)
+            } catch (e: Exception) {
+                _quizState.value = QuizState.Error("Failed to reset quiz: ${e.message}")
+            }
+        }
+    }
+
 }

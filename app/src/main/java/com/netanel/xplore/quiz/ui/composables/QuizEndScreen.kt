@@ -3,7 +3,6 @@ package com.netanel.xplore.quiz.ui.composables
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,9 +38,6 @@ import com.netanel.xplore.R
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.BackgroundDark
 import com.netanel.xplore.ui.theme.BluePrimary
-import com.netanel.xplore.ui.theme.GradientEnd
-import com.netanel.xplore.ui.theme.GradientMid
-import com.netanel.xplore.ui.theme.GradientStart
 import com.netanel.xplore.ui.theme.Pink40
 import com.netanel.xplore.ui.theme.White
 import kotlinx.coroutines.delay
@@ -70,12 +65,7 @@ fun QuizEndScreen(
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(GradientStart, GradientMid, GradientEnd)
-                )
-            ),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         // 🎊 Confetti Effect (separate layer)

@@ -27,4 +27,11 @@
     <string name="quiz_completed"> כל הכבוד! סיימת את החידון🎉</string>
     <string name="final_score">הניקוד שלך: %1$d נקודות</string>
     <string name="go_home">🏠 חזור למסך הראשי</string>
+
+    <!-- 📖 Quiz Question Strings -->
+    <string name="question_number">שאלה %1$d מתוך %2$d</string>
+    <string name="next_question">לשאלה הבאה</string>
+    <string name="previous_question">שאלה קודמת</string>
+    <string name="submit">לשאלה הבאה</string>
+    <string name="quiz_timer">⏳ 01:14</string>
 </resources>

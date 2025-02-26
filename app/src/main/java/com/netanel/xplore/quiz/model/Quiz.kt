@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Quiz(
+    var _id: String = "",
     var questions: List<Question>,
     val timer: Int,
     val title: String? = null,
