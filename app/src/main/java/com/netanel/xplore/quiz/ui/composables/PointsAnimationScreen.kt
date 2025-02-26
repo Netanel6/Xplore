@@ -23,6 +23,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.netanel.xplore.ui.theme.OnPrimary
 
 
 @Composable
@@ -68,7 +69,7 @@ fun PointsAnimationScreen(
                 text = answerText,
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = if (isCorrect) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    color = if (isCorrect) OnPrimary else MaterialTheme.colorScheme.error
                 ),
                 textAlign = TextAlign.Center
             )

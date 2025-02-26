@@ -3,31 +3,24 @@ package com.netanel.xplore.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // 🎨 Primary Colors
-val BluePrimary = Color(0xFF4285F4)
-val PurpleGrey40 = Color(0xFF6200EA)
-val Pink40 = Color(0xFFB00020)
+val SoftWhite = Color(0xFFFAF9F6)
+val NeutralGray = Color(0xFFD6D6D6)
+val SoftBeige = Color(0xFFF5E7DA)
 
 // 🎨 Supporting Colors
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-val White = Color(0xFFFFFFFF)
+val MediumGray = Color(0xFFBDBDBD)
+val LightCream = Color(0xFFFFF5E1)
+val DarkerGray = Color(0xFFFFFFFF)
+val PaleBlue = Color(0xFF6A89CC)
 
 // 🎨 Background Colors
-val BackgroundLight = Color(0xFFF5F5F5)
-val BackgroundDark = Color(0xFF121212)
+val BackgroundLight = SoftWhite
+val BackgroundDark = Color(0xFF2D2D2D) //DM BG
 
 // 🎨 Text Colors
-val OnPrimary = Color(0xFFFFFFFF)
-val OnSecondary = Color(0xFF000000)
-
-// 🎨 Custom Gradient Colors (Used in Quiz Screens)
-// 🎨 Quiz Background Gradient Colors
-val GradientStart = Color(0xFF6A11CB)
-val GradientMid = Color(0xFF2575FC)
-val GradientEnd = Color(0xFF4285F4)
+val OnPrimary = Color(0xff0b42a3) //PrimaryDark
+val OnSecondary = Color(0xFF5A5A5A) //SecondaryGray
 
 // 🎨 Answer Colors
-val AnswerSelected = Color(0xFF655BFF)
-val AnswerLocked = Color(0xFFB00020)
-val AnswerUnselected = Color(0xFFE0E0E0)
-val AnswerBorder = Color(0xFFB0BEC5)
+val AnswerUnselected = NeutralGray
+val AnswerBorder = MediumGray

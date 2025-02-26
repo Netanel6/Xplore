@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.netanel.xplore.ui.theme.OnPrimary
 
 @Composable
 fun LoadingScreen() {
@@ -21,7 +22,7 @@ fun LoadingScreen() {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            CircularProgressIndicator(color = OnPrimary)
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "טוען חידון...",

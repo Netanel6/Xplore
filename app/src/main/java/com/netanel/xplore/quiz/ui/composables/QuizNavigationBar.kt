@@ -14,9 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.netanel.xplore.R
+import com.netanel.xplore.ui.theme.OnPrimary
 
 @Composable
 fun QuizNavigationBar(
@@ -29,27 +29,30 @@ fun QuizNavigationBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 🔹 Previous Button
         IconButton(onClick = { onPreviousClicked() }) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = stringResource(R.string.previous_question),
-                tint = Color.White
+                tint = OnPrimary
             )
         }
 
+        // 🔹 Quiz Timer Placeholder
         Text(
             text = stringResource(R.string.quiz_timer),
-            color = Color.White,
-            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
         )
 
+        // 🔹 Submit / Next Button
         Button(
             onClick = { onNextClicked() },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            colors = ButtonDefaults.buttonColors(containerColor = OnPrimary),
             enabled = isNextEnabled
         ) {
-            Text(stringResource(R.string.submit), color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.submit), color = MaterialTheme.colorScheme.onPrimary)
         }
     }
 }

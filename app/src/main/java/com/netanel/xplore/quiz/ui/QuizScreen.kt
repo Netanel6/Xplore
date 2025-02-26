@@ -47,8 +47,7 @@ fun QuizScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         when (quizState) {
@@ -58,18 +57,17 @@ fun QuizScreen(
                 val quiz = (quizState as QuizState.Loaded).quiz
                 val questions = quiz.questions
 
-                // ✅ If all questions are answered, show the final score screen
-                val allQuestionsAnswered = questions.all { it.isAnswered }
-
-                if (allQuestionsAnswered) {
+                // ✅ Show final score screen when all questions are answered
+                if (questions.all { it.isAnswered }) {
                     QuizEndScreen(
                         totalScore = quiz.totalScore,
                         onTryAgain = {
-                            // TODO: Show Popup before resetting (create dynamic one)
                             viewModel.resetQuiz()
                             viewModel.loadQuiz(quizId)
                         },
-                        onGoHome = { /* Navigate Home */ }
+                        onGoHome = {
+
+                        }
                     )
                     return
                 }
@@ -88,7 +86,6 @@ fun QuizScreen(
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // 📍 Display Current Question
                             QuizQuestion(
                                 question = currentQuestion,
                                 currentQuestionNumber = currentQuestionIndex + 1,

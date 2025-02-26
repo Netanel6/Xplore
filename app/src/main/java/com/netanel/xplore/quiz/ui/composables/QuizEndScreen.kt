@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,10 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.netanel.xplore.R
 import com.netanel.xplore.ui.AnimatedComposable
-import com.netanel.xplore.ui.theme.BackgroundDark
-import com.netanel.xplore.ui.theme.BluePrimary
-import com.netanel.xplore.ui.theme.Pink40
-import com.netanel.xplore.ui.theme.White
+import com.netanel.xplore.ui.theme.OnPrimary
 import kotlinx.coroutines.delay
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
@@ -56,19 +54,18 @@ fun QuizEndScreen(
     var isConfettiVisible by remember { mutableStateOf(true) }
     var isUiVisible by remember { mutableStateOf(false) }
 
-    // 🔥 Trigger confetti immediately, hide after 3s, then show UI
+    // 🔥 Trigger confetti effect for 3s before revealing UI
     LaunchedEffect(Unit) {
-        delay(3000) // Wait for 3 seconds before hiding confetti
+        delay(3000)
         isConfettiVisible = false
-        isUiVisible = true // UI appears only after confetti disappears
+        isUiVisible = true
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // 🎊 Confetti Effect (separate layer)
+        // 🎊 Confetti Effect
         AnimatedComposable(
             isVisible = isConfettiVisible,
             content = {
@@ -99,8 +96,8 @@ fun QuizEndScreen(
                     // 🎉 Success Icon
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Completed",
-                        tint = White,
+                        contentDescription = stringResource(R.string.quiz_completed),
+                        tint = OnPrimary,
                         modifier = Modifier.size(100.dp)
                     )
 
@@ -111,7 +108,7 @@ fun QuizEndScreen(
                         text = stringResource(R.string.quiz_completed),
                         fontSize = 30.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                        color = White
+                        color = MaterialTheme.colorScheme.onBackground
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -122,13 +119,13 @@ fun QuizEndScreen(
                             .padding(8.dp)
                             .shadow(8.dp, RoundedCornerShape(12.dp)),
                         shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = White)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Text(
                             text = stringResource(R.string.final_score, totalScore),
                             fontSize = 24.sp,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
-                            color = BackgroundDark,
+                            color = OnPrimary,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
@@ -142,7 +139,7 @@ fun QuizEndScreen(
                     ) {
                         Button(
                             onClick = onTryAgain,
-                            colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.padding(8.dp)
                         ) {
@@ -151,7 +148,7 @@ fun QuizEndScreen(
 
                         Button(
                             onClick = onGoHome,
-                            colors = ButtonDefaults.buttonColors(containerColor = Pink40),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.padding(8.dp)
                         ) {

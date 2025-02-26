@@ -17,15 +17,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.netanel.xplore.R
 import com.netanel.xplore.quiz.model.Question
-import com.netanel.xplore.ui.theme.AnswerLocked
-import com.netanel.xplore.ui.theme.AnswerSelected
+import com.netanel.xplore.ui.theme.AnswerBorder
 import com.netanel.xplore.ui.theme.AnswerUnselected
+import com.netanel.xplore.ui.theme.BackgroundLight
+import com.netanel.xplore.ui.theme.OnPrimary
+import com.netanel.xplore.ui.theme.OnSecondary
+import com.netanel.xplore.ui.theme.SoftWhite
 
 @Composable
 fun QuizQuestion(
@@ -61,21 +63,22 @@ fun QuizQuestion(
                 .fillMaxWidth()
                 .padding(8.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = BackgroundLight),
             elevation = CardDefaults.cardElevation(6.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = stringResource(R.string.question_number, currentQuestionNumber, totalQuestions),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary
+                    color = OnPrimary
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = question.text.orEmpty(),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = OnSecondary
                 )
             }
         }
@@ -102,10 +105,14 @@ fun AnswerButton(
     isLocked: Boolean,
     onClick: () -> Unit
 ) {
-    val buttonColor = when {
-        isLocked && isSelected -> AnswerLocked
-        isSelected -> AnswerSelected
-        else -> AnswerUnselected
+    val containerColor = when {
+        isSelected ->  AnswerUnselected// ⚪ Selected Answer (Blue)
+        else -> OnPrimary // 🔵 Default Unselected Answer (Soft Gray)
+    }
+
+    val contentColor = when {
+        isSelected -> SoftWhite
+        else -> OnPrimary
     }
 
     Button(
@@ -115,15 +122,16 @@ fun AnswerButton(
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
-            contentColor = if (!isSelected) Color.White else MaterialTheme.colorScheme.primary
+            containerColor = containerColor,
+            contentColor = contentColor
         ),
-        border = if (!isSelected) BorderStroke(1.dp, AnswerUnselected) else BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        border = if (!isSelected) BorderStroke(2.dp, AnswerBorder) else BorderStroke(2.dp, OnPrimary),
         enabled = !isLocked
     ) {
         Text(
             text = answer,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+            color = if (isSelected) OnPrimary else SoftWhite,
         )
     }
 }

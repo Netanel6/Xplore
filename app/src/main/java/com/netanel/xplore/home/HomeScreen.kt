@@ -50,9 +50,8 @@ import com.netanel.xplore.R
 import com.netanel.xplore.auth.repository.model.User
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.ui.AnimatedComposable
-import com.netanel.xplore.ui.theme.BluePrimary
 import com.netanel.xplore.ui.theme.OnPrimary
-import com.netanel.xplore.ui.theme.Pink40
+import com.netanel.xplore.ui.theme.SoftWhite
 import kotlinx.coroutines.delay
 
 @Composable
@@ -64,9 +63,8 @@ fun HomeScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val quizList by homeViewModel.quizList.collectAsState()
-    var showQuizList by remember { mutableStateOf(false) }
     val username by userViewModel.username.collectAsState(initial = "")
-
+    var showQuizList by remember { mutableStateOf(false) }
     var isUiVisible by remember { mutableStateOf(false) }
 
     // 🌟 Fade-in Animation
@@ -79,6 +77,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -87,19 +86,17 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 🔹 Welcome Text (Ensures visibility)
+            // 🔹 Welcome Text
             AnimatedComposable(
                 isVisible = isUiVisible,
                 enter = fadeIn(animationSpec = tween(1000)),
                 content = {
                     Text(
                         text = stringResource(R.string.welcome_back, username),
-                        fontSize = 30.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                        color = OnPrimary,
+                        modifier = Modifier.padding(16.dp)
                     )
                 }
             )
@@ -119,8 +116,8 @@ fun HomeScreen(
                             .height(56.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = BluePrimary,
-                            contentColor = OnPrimary
+                            containerColor = OnPrimary,
+                            contentColor = SoftWhite
                         )
                     ) {
                         Text(stringResource(R.string.select_quiz))
@@ -143,8 +140,8 @@ fun HomeScreen(
                             .height(56.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Pink40,
-                            contentColor = OnPrimary
+                            containerColor = OnPrimary,
+                            contentColor = SoftWhite
                         )
                     ) {
                         Text(stringResource(R.string.logout))
@@ -154,7 +151,7 @@ fun HomeScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // 🎮 Quiz List (Properly aligned below the buttons)
+            // 🎮 Quiz List
             AnimatedComposable(
                 isVisible = showQuizList,
                 enter = expandVertically(animationSpec = tween(500)),
@@ -199,18 +196,19 @@ fun QuizList(
                 Text(
                     stringResource(id = R.string.select_quiz_title),
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary
+                    color = OnPrimary
                 )
                 IconButton(onClick = onClose) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel),
                         contentDescription = "Close",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = OnPrimary
                     )
                 }
             }
 
             Divider(color = MaterialTheme.colorScheme.onPrimary, thickness = 1.dp)
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -249,14 +247,14 @@ fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit, backgroundColor: Color) {
             Icon(
                 painter = painterResource(id = R.drawable.question_mark),
                 contentDescription = "Quiz icon",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = OnPrimary,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(
                     text = quiz.title,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                    style = MaterialTheme.typography.bodyLarge.copy(color = OnPrimary)
                 )
             }
         }

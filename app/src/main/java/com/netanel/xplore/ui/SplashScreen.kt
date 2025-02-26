@@ -4,11 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.netanel.xplore.ui.theme.OnPrimary
+import com.netanel.xplore.ui.theme.OnSecondary
 
 @Composable
 fun SplashScreen(isLoggedIn: Boolean) {
@@ -27,8 +28,8 @@ fun SplashScreen(isLoggedIn: Boolean) {
 @Composable
 fun getSplashScreenColors(isLoggedIn: Boolean): Pair<Color, Color> {
     return if (isLoggedIn) {
-        Color.White to MaterialTheme.colorScheme.primary
+        OnSecondary to OnPrimary
     } else {
-        MaterialTheme.colorScheme.primary to Color.White
+        OnPrimary to OnSecondary
     }
 }

@@ -36,19 +36,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthViewModel.AuthState
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.ui.AnimatedComposable
-import com.netanel.xplore.ui.theme.BackgroundLight
-import com.netanel.xplore.ui.theme.BluePrimary
-import com.netanel.xplore.ui.theme.Pink40
-import com.netanel.xplore.ui.theme.White
+import com.netanel.xplore.ui.theme.OnPrimary
 
 @Composable
 fun AuthScreen(
@@ -79,7 +74,6 @@ fun AuthScreen(
         }
     }
 
-    // 🌟 Gradient Background
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -108,14 +102,14 @@ fun AuthScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 🔹 App Title
+                   /* // 🔹 App Title
                     Text(
                         text = stringResource(R.string.app_name),
                         fontSize = 34.sp,
                         fontWeight = FontWeight.Bold,
-                        color = White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
-
+*/
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // 🔹 Authentication Card
@@ -149,7 +143,7 @@ fun AuthInputCard(
             .padding(8.dp)
             .shadow(6.dp, RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = BackgroundLight)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
@@ -173,12 +167,12 @@ fun AuthInputCard(
                     .height(56.dp),
                 shape = RoundedCornerShape(8.dp),
                 enabled = phoneNumber.isNotBlank() && authState != AuthState.Loading,
-                colors = ButtonDefaults.buttonColors(containerColor = BluePrimary, contentColor = White)
+                colors = ButtonDefaults.buttonColors(containerColor = OnPrimary)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
                     Text(stringResource(R.string.next_step))
@@ -195,7 +189,7 @@ fun AuthInputCard(
                     if (errorMessage != null) {
                         Text(
                             text = errorMessage,
-                            color = Pink40,
+                            color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
