@@ -34,7 +34,14 @@ fun QuizScreen(
             val allQuestionsAnswered = questions.all { it.isAnswered }
 
             if (allQuestionsAnswered) {
-                QuizEndScreen(totalScore = quiz.totalScore)
+                QuizEndScreen(
+                    totalScore = quiz.totalScore,
+                    onTryAgain = {
+
+                    },
+                    onGoHome = {
+
+                    })
                 return
             }
 

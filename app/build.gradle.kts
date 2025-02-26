@@ -130,6 +130,9 @@ dependencies {
     kapt(libs.room.compiler)
     implementation(libs.room.ktx)
 
+    // Confetti
+    implementation(libs.konfetti.compose)
+
     // Testing Dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
