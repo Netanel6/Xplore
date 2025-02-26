@@ -1,8 +1,8 @@
 package com.netanel.xplore.home
 
-
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +38,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,6 +54,7 @@ import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.BluePrimary
 import com.netanel.xplore.ui.theme.OnPrimary
 import com.netanel.xplore.ui.theme.Pink40
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -65,36 +68,51 @@ fun HomeScreen(
     var showQuizList by remember { mutableStateOf(false) }
     val username by userViewModel.username.collectAsState(initial = "")
 
-    LaunchedEffect(userId) {
+    var isUiVisible by remember { mutableStateOf(false) }
+
+    // 🌟 Fade-in Animation
+    LaunchedEffect(Unit) {
         homeViewModel.fetchQuizzes(userId)
+        delay(300)
+        isUiVisible = true
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
+                )
+            ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
+            verticalArrangement = Arrangement.Top, // 👈 Aligns UI properly
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title Section
-            Column(
-                modifier = Modifier.padding(bottom = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "ברוך הבא, $username",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 36.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            // 🔹 Welcome Text (Ensures visibility)
+            AnimatedComposable(
+                isVisible = isUiVisible,
+                enter = fadeIn(animationSpec = tween(1000)),
+                content = {
+                    Text(
+                        text = stringResource(R.string.welcome_back, username),
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)) // 👈 Ensures visibility
+                    )
+                }
+            )
 
-            // "Select Quiz" Button
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 🏆 Select Quiz Button
             AnimatedComposable(
                 isVisible = !showQuizList,
                 enter = expandVertically(animationSpec = tween(500)),
@@ -118,16 +136,14 @@ fun HomeScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // "Logout" Button
+            // 🚪 Logout Button
             AnimatedComposable(
                 isVisible = !showQuizList,
                 enter = expandVertically(animationSpec = tween(500)),
                 exit = shrinkVertically(animationSpec = tween(500)),
                 content = {
                     Button(
-                        onClick = {
-                            onLogoutClicked()
-                        },
+                        onClick = { onLogoutClicked() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -142,7 +158,9 @@ fun HomeScreen(
                 }
             )
 
-            // Quiz List Section
+            Spacer(Modifier.height(20.dp))
+
+            // 🎮 Quiz List (Properly aligned below the buttons)
             AnimatedComposable(
                 isVisible = showQuizList,
                 enter = expandVertically(animationSpec = tween(500)),
@@ -161,6 +179,7 @@ fun HomeScreen(
         }
     }
 }
+
 @Composable
 fun QuizList(
     quizzes: List<User.Quiz>,
@@ -170,12 +189,10 @@ fun QuizList(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F5F5)
-        ),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .padding(16.dp)
+            .shadow(8.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
@@ -199,7 +216,7 @@ fun QuizList(
                 }
             }
 
-            Divider(color = Color.White, thickness = 1.dp)
+            Divider(color = MaterialTheme.colorScheme.onPrimary, thickness = 1.dp)
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -210,7 +227,7 @@ fun QuizList(
                     QuizListItem(
                         quiz = quiz,
                         onClick = { onQuizSelected(quiz.id) },
-                        backgroundColor = if (index % 2 == 0) Color.White else Color.Gray
+                        backgroundColor = if (index % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
             }
@@ -226,7 +243,7 @@ fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit, backgroundColor: Color) {
             .padding(vertical = 4.dp)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
