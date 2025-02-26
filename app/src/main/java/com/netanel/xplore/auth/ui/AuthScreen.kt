@@ -1,8 +1,8 @@
 package com.netanel.xplore.auth.ui
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
@@ -34,9 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +45,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthViewModel.AuthState
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
+import com.netanel.xplore.ui.AnimatedComposable
+import kotlinx.coroutines.delay
 
 @Composable
 fun AuthScreen(
@@ -53,12 +54,18 @@ fun AuthScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     var phoneNumber by remember { mutableStateOf("") }
     val authState by authViewModel.authState
     var isLoading by remember { mutableStateOf(false) }
+    var isUiVisible by remember { mutableStateOf(false) }
 
+    // 🚀 UI Fade-in Animation
+    LaunchedEffect(Unit) {
+        delay(500) // Delay for smooth appearance
+        isUiVisible = true
+    }
 
+    // 🎯 Handle Authentication State
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.VerificationCompleted -> {
@@ -69,8 +76,7 @@ fun AuthScreen(
 
             is AuthState.Error -> {
                 isLoading = false
-                val errorMessage = (authState as AuthState.Error).message
-                Log.d("AuthScreen", "Error: $errorMessage")
+                Log.d("AuthScreen", "Error: ${(authState as AuthState.Error).message}")
             }
 
             else -> {}
@@ -80,46 +86,63 @@ fun AuthScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.tertiary
+                    )
+                )
+            ),
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = "App logo",
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(CircleShape)
-                    .fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+        // 🎬 Animated UI
+        AnimatedComposable(
+            isVisible = isUiVisible,
+            enter = fadeIn(animationSpec = tween(1000)) + slideInVertically(animationSpec = tween(700)),
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // 🌟 App Logo
+                    Image(
+                        painter = painterResource(id = R.drawable.app_logo),
+                        contentDescription = "App Logo",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape),
+                    )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = stringResource(R.string.app_name),
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+                    // 📌 App Title
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 
-            AuthInputCard(
-                phoneNumber = phoneNumber,
-                onPhoneNumberChange = { phoneNumber = it },
-                authState = authState,
-                isLoading = isLoading,
-                onButtonClick = {
-                    isLoading = true
-                    authViewModel.startUserVerification(phoneNumber)
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // 🔐 Auth Input Card
+                    AuthInputCard(
+                        phoneNumber = phoneNumber,
+                        onPhoneNumberChange = { phoneNumber = it },
+                        authState = authState,
+                        isLoading = isLoading,
+                        onButtonClick = {
+                            isLoading = true
+                            authViewModel.startUserVerification(phoneNumber)
+                        }
+                    )
                 }
-            )
-        }
+            }
+        )
     }
 }
 
@@ -134,25 +157,25 @@ fun AuthInputCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            .padding(16.dp)
+            .shadow(6.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(
-            modifier = Modifier
-                .padding(24.dp),
+            modifier = Modifier.padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
+            // 📱 Phone Input
             OutlinedTextField(
                 value = phoneNumber,
                 onValueChange = onPhoneNumberChange,
-                label = { Text(stringResource(R.string.to_login_write_phone_number)) },
+                label = { Text(stringResource(R.string.what_is_your_number)) },
                 modifier = Modifier.fillMaxWidth()
-
             )
 
+            // 🔄 Login Button
             Button(
                 onClick = onButtonClick,
                 modifier = Modifier
@@ -164,33 +187,29 @@ fun AuthInputCard(
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
                     Text(stringResource(R.string.next_step))
                 }
             }
 
-            AnimatedVisibility(
-                visible = authState is AuthState.Error,
-                enter = slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = tween(500)
-                ),
-                exit = slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = tween(300)
-                )
-            ) {
-                val errorMessage = (authState as? AuthState.Error)?.message
-                if (errorMessage != null) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+            // ❌ Animated Error Message
+            AnimatedComposable(
+                isVisible = authState is AuthState.Error,
+                enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(500)),
+                exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(300)),
+                content = {
+                    val errorMessage = (authState as? AuthState.Error)?.message
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
-            }
+            )
         }
     }
 }
