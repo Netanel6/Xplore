@@ -13,8 +13,17 @@ data class Question(
     val points: Int,
     val type: QuestionType? = null,
     val difficulty: DifficultyLevel,
-    val isMandatory: Boolean? = null
+    val isMandatory: Boolean? = null,
+    var userSelectedAnswer: Int? = null,
+    var isAnswered: Boolean = false,
+    var pointsGained: Int = 0,
+    var isCorrect: Boolean = false
 ) {
+
+    fun isAnswerLocked(): Boolean {
+        return isAnswered
+    }
+
     @Serializable
     enum class QuestionType {
         American, TrueOrFalse, FillInTheBlank

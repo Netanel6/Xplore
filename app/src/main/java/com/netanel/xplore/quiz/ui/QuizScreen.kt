@@ -1,21 +1,14 @@
 package com.netanel.xplore.quiz.ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.ui.composables.LoadingScreen
-import com.netanel.xplore.quiz.ui.composables.PointsAnimationScreen
 import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
 import com.netanel.xplore.quiz.ui.composables.QuizQuestion
 @Composable
 fun QuizScreen(
-    userId: String,
     quizId: String,
     viewModel: QuizViewModel = hiltViewModel()
 ) {
@@ -23,91 +16,52 @@ fun QuizScreen(
         viewModel.loadQuiz(quizId)
     }
 
-    val quiz by viewModel.quiz.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val questions by viewModel.questions.collectAsState()
-    val totalScore by viewModel.totalScore.collectAsState()
+    val quizState by viewModel.quizState.collectAsState()
+    val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
 
-    var currentQuestionIndex by remember { mutableIntStateOf(0) }
-    var selectedAnswer by remember { mutableStateOf<Int?>(null) }
-    var isAnswerLocked by remember { mutableStateOf(false) }
-    var showAnimation by remember { mutableStateOf(false) }
-    var pointsGained by remember { mutableStateOf(0) }
-    var isCorrect by remember { mutableStateOf(false) }
-    val answerStates = remember { mutableMapOf<Int, Pair<Int?, Boolean>>() }
-    val scoredQuestions = remember { mutableSetOf<Int>() }
+    when (quizState) {
+        is QuizState.Loading -> LoadingScreen()
+        is QuizState.Error -> QuizErrorScreen(errorMessage = (quizState as QuizState.Error).message)
+        is QuizState.Loaded -> {
+            val quiz = (quizState as QuizState.Loaded).quiz
+            val questions = quiz.questions
 
-    if (quiz == null && isLoading) {
-        LoadingScreen()
-        return
-    }
+            // ✅ If all questions are answered, show the final score screen
+            val allQuestionsAnswered = questions.all { it.isAnswered }
 
-    val currentQuestion = questions.getOrNull(currentQuestionIndex)
-
-    if (currentQuestion == null) {
-        QuizEndScreen(totalScore = totalScore)
-        return
-    }
-
-    // Restore state only after answering or navigating
-    LaunchedEffect(currentQuestionIndex) {
-        val previousState = answerStates[currentQuestionIndex]
-        selectedAnswer = previousState?.first
-        isAnswerLocked = previousState?.second ?: false
-    }
-
-    if (showAnimation) {
-        val correctAnswerText = currentQuestion.answers?.get(currentQuestion.correctAnswerIndex ?: -1).orEmpty()
-
-        PointsAnimationScreen(
-            points = pointsGained,
-            isCorrect = isCorrect,
-            correctAnswer = correctAnswerText,
-            onAnimationEnd = {
-                showAnimation = false
-                currentQuestionIndex++
-                selectedAnswer = null
-                isAnswerLocked = false
+            if (allQuestionsAnswered) {
+                QuizEndScreen(totalScore = quiz.totalScore)
+                return
             }
-        )
-    } else {
-        QuizQuestion(
-            question = currentQuestion,
-            currentQuestionNumber = currentQuestionIndex + 1,
-            totalQuestions = questions.size,
-            userSelectedAnswer = selectedAnswer,
-            isAnswerLocked = isAnswerLocked,
-            onAnswerSelected = { selectedIndex ->
-                if (!isAnswerLocked) {
-                    selectedAnswer = selectedIndex
-                }
-            },
-            onNextClicked = {
-                if (selectedAnswer != null) {
-                    answerStates[currentQuestionIndex] = selectedAnswer to true
-                    isAnswerLocked = true
 
-                    if (currentQuestionIndex !in scoredQuestions) {
-                        isCorrect = selectedAnswer == currentQuestion.correctAnswerIndex
-                        pointsGained = if (isCorrect) currentQuestion.points else 0
-                        if (isCorrect) {
-                            viewModel.addScore(pointsGained)
-                        }
-                        scoredQuestions.add(currentQuestionIndex)
-                        showAnimation = true
-                    } else {
-                        currentQuestionIndex++
-                        selectedAnswer = null
-                        isAnswerLocked = false
-                    }
+            val currentQuestion = questions.getOrNull(currentQuestionIndex) ?: return
+
+            QuizQuestion(
+                question = currentQuestion,
+                currentQuestionNumber = currentQuestionIndex + 1,
+                totalQuestions = questions.size,
+                onAnswerSelected = { answerIndex ->
+                    viewModel.selectAnswer(answerIndex)
+                },
+                onNextClicked = {
+                    viewModel.lockAnswer()
+                    viewModel.nextQuestion()
+                },
+                onPreviousClicked = {
+                    viewModel.previousQuestion()
                 }
-            },
-            onPreviousClicked = {
-                if (currentQuestionIndex > 0) {
-                    answerStates[currentQuestionIndex] = selectedAnswer to isAnswerLocked
-                    currentQuestionIndex--
-                }
-            }
-        )
+            )
+        }
     }
+}
+
+@Composable
+fun QuizErrorScreen(errorMessage: String) {
+    Text(text = errorMessage)
+}
+
+sealed class QuizState {
+    object Loading : QuizState()
+    data class Loaded(val quiz: Quiz) : QuizState()
+    data class Error(val message: String) : QuizState()
 }

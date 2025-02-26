@@ -1,46 +1,33 @@
 package com.netanel.xplore.quiz.ui.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.netanel.xplore.quiz.model.Question
-
 
 @Composable
 fun QuizQuestion(
     question: Question,
     currentQuestionNumber: Int,
     totalQuestions: Int,
-    userSelectedAnswer: Int?,
-    isAnswerLocked: Boolean,
     onAnswerSelected: (Int) -> Unit,
     onNextClicked: () -> Unit,
     onPreviousClicked: () -> Unit
 ) {
-    val shuffledAnswers = remember(currentQuestionNumber) {
-        question.answers?.mapIndexed { index, answer -> index to answer }?.shuffled()
-    }
+    // 🔹 State for the selected answer, reset when question changes
+    var selectedAnswer by remember(question.id) { mutableStateOf(question.userSelectedAnswer) }
+
+    // 🔹 State to control "Next" button, resets when question changes
+    var isNextEnabled by remember(question.id) { mutableStateOf(selectedAnswer != null) }
 
     Column(
         modifier = Modifier
@@ -48,7 +35,7 @@ fun QuizQuestion(
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Navigation and Question Number
+        // 🔹 Navigation Bar (Previous Button, Question Number, Next Button)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -61,10 +48,26 @@ fun QuizQuestion(
             ) {
                 Text("קודם")
             }
-            QuestionNumberDisplay(currentQuestionNumber, totalQuestions)
+
+            Text(
+                text = "שאלה $currentQuestionNumber מתוך $totalQuestions",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Button(
+                onClick = {
+                    onNextClicked()
+                    selectedAnswer = null  // 🔹 Reset answer when moving to the next question
+                    isNextEnabled = false  // 🔹 Disable "Next" until a new answer is selected
+                },
+                enabled = isNextEnabled, // ✅ Button enabled only if an answer is selected
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("לשאלה הבאה")
+            }
         }
 
-        // Question Text
+        // 🔹 Question Text
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -80,19 +83,29 @@ fun QuizQuestion(
             )
         }
 
-        // Answer Options
+        // 🔹 Answer Options
         Column(modifier = Modifier.fillMaxWidth()) {
-            shuffledAnswers?.forEach { (originalIndex, answer) ->
-                val isSelected = userSelectedAnswer == originalIndex
+            question.answers?.forEachIndexed { index, answer ->
+                val isSelected = selectedAnswer == index
+                val isLocked = question.isAnswered
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
-                        .clickable(enabled = !isAnswerLocked) { onAnswerSelected(originalIndex) },
+                        .clickable(enabled = !isLocked) { // ✅ Click only if question is not locked
+                            selectedAnswer = index
+                            isNextEnabled = true  // 🔹 Enable "Next" once an answer is selected
+                            onAnswerSelected(index)
+                        },
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(2.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface
+                        containerColor = when {
+                            isLocked && isSelected -> MaterialTheme.colorScheme.secondary // ✅ Locked Answer Color
+                            isSelected -> MaterialTheme.colorScheme.tertiary // ✅ Selected Answer Color
+                            else -> MaterialTheme.colorScheme.surface
+                        }
                     )
                 ) {
                     Row(
@@ -101,7 +114,7 @@ fun QuizQuestion(
                     ) {
                         RadioButton(
                             selected = isSelected,
-                            onClick = null
+                            onClick = null // Controlled by card click
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
@@ -111,18 +124,6 @@ fun QuizQuestion(
                     }
                 }
             }
-        }
-
-        // Next Question Button
-        Button(
-            onClick = { onNextClicked() },
-            enabled = userSelectedAnswer != null,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Text("לשאלה הבאה")
         }
     }
 }

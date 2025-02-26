@@ -93,7 +93,6 @@ fun NavigationStack(
             )
         ) { backStackEntry ->
             QuizScreen(
-                userId = backStackEntry.arguments?.getString("userId") ?: "",
                 quizId = backStackEntry.arguments?.getString("quizId") ?: ""
             )
         }

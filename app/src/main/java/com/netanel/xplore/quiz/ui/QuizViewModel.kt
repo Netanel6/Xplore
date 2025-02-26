@@ -2,7 +2,6 @@ package com.netanel.xplore.quiz.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.repository.QuizRepository
@@ -17,47 +16,74 @@ class QuizViewModel @Inject constructor(
     private val repository: QuizRepository
 ) : ViewModel() {
 
-    // StateFlow to hold the quiz
-    private val _quiz = MutableStateFlow<Quiz?>(null)
-    val quiz: StateFlow<Quiz?> get() = _quiz
+    private val _quizState = MutableStateFlow<QuizState>(QuizState.Loading)
+    val quizState: StateFlow<QuizState> get() = _quizState
 
-    // StateFlow to hold the list of questions
-    private val _questions = MutableStateFlow<List<Question>>(emptyList())
-    val questions: StateFlow<List<Question>> get() = _questions
-
-    // StateFlow to handle loading state
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
-
-    // StateFlow to handle error messages
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> get() = _error
-
-    // DataFlow to handle scoring
-    private val _totalScore = MutableStateFlow(0)
-    val totalScore: StateFlow<Int> get() = _totalScore
-
+    private var currentQuiz: Quiz? = null
+    private val _currentQuestionIndex = MutableStateFlow(0)
+    val currentQuestionIndex: StateFlow<Int> get() = _currentQuestionIndex
 
     fun loadQuiz(quizId: String) {
         viewModelScope.launch {
-            _isLoading.value = true
+            _quizState.value = QuizState.Loading
             try {
-                val loadedQuiz = repository.getQuiz(quizId)
-                _quiz.value = loadedQuiz
-                _questions.value = loadedQuiz.questions
-                _error.value = null
+                val loadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0) // Initialize totalScore
+                currentQuiz = loadedQuiz
+                _quizState.value = QuizState.Loaded(currentQuiz!!)
             } catch (e: Exception) {
-                e.printStackTrace()
-                _error.value = "Failed to load quiz: ${e.message}"
-            } finally {
-                _isLoading.value = false
+                _quizState.value = QuizState.Error("Failed to load quiz: ${e.message}")
             }
         }
     }
 
+    fun selectAnswer(answerIndex: Int) {
+        currentQuiz?.let { quiz ->
+            val questions = quiz.questions.toMutableList()
+            val question = questions[_currentQuestionIndex.value]
 
-    fun addScore(points: Int) {
-        _totalScore.value += points
+            if (!question.isAnswered) {
+                questions[_currentQuestionIndex.value] = question.copy(userSelectedAnswer = answerIndex)
+                currentQuiz = quiz.copy(questions = questions)
+                _quizState.value = QuizState.Loaded(currentQuiz!!)
+            }
+        }
     }
 
+    fun lockAnswer() {
+        currentQuiz?.let { quiz ->
+            val questions = quiz.questions.toMutableList()
+            val question = questions[_currentQuestionIndex.value]
+
+            if (!question.isAnswered && question.userSelectedAnswer != null) {
+                val isCorrect = question.userSelectedAnswer == question.correctAnswerIndex
+                val pointsGained = if (isCorrect) question.points else 0
+
+                questions[_currentQuestionIndex.value] = question.copy(
+                    isAnswered = true,
+                    pointsGained = pointsGained,
+                    isCorrect = isCorrect
+                )
+                currentQuiz = quiz.copy(
+                    questions = questions,
+                    totalScore = quiz.totalScore + pointsGained
+                )
+                _quizState.value = QuizState.Loaded(currentQuiz!!)
+            }
+        }
+    }
+
+    fun nextQuestion() {
+        val quizSize = currentQuiz?.questions?.size ?: 1
+        if (_currentQuestionIndex.value < quizSize - 1) {
+            _currentQuestionIndex.value += 1
+            _quizState.value = QuizState.Loaded(currentQuiz!!)
+        }
+    }
+
+    fun previousQuestion() {
+        if (_currentQuestionIndex.value > 0) {
+            _currentQuestionIndex.value -= 1
+            _quizState.value = QuizState.Loaded(currentQuiz!!)
+        }
+    }
 }

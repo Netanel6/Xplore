@@ -14,5 +14,6 @@ data class Quiz(
     val endTime: String? = null,
     val maxParticipants: Int? = null,
     val tags: List<String>? = null,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    var totalScore: Int = 0
 )
