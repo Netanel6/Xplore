@@ -24,7 +24,7 @@
     <string name="logout">🚪 התנתקות</string>
 
     <!-- 🏆 Quiz End Screen -->
-    <string name="quiz_completed"> כל הכבוד! סיימת את החידון 🎉</string>
+    <string name="quiz_completed"> כל הכבוד! סיימת את החידון🎉</string>
     <string name="final_score">הניקוד שלך: %1$d נקודות</string>
     <string name="go_home">🏠 חזור למסך הראשי</string>
 </resources>
