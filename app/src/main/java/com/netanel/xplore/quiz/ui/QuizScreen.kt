@@ -1,12 +1,16 @@
 package com.netanel.xplore.quiz.ui
 
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.ui.composables.LoadingScreen
 import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
 import com.netanel.xplore.quiz.ui.composables.QuizQuestion
+
 @Composable
 fun QuizScreen(
     quizId: String,
@@ -61,7 +65,7 @@ fun QuizErrorScreen(errorMessage: String) {
 }
 
 sealed class QuizState {
-    object Loading : QuizState()
+    data object Loading : QuizState()
     data class Loaded(val quiz: Quiz) : QuizState()
     data class Error(val message: String) : QuizState()
 }

@@ -27,7 +27,7 @@ class QuizViewModel @Inject constructor(
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
             try {
-                val loadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0) // Initialize totalScore
+                val loadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0)
                 currentQuiz = loadedQuiz
                 _quizState.value = QuizState.Loaded(currentQuiz!!)
             } catch (e: Exception) {
