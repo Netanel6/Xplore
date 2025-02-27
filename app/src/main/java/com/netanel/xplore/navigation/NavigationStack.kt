@@ -93,7 +93,8 @@ fun NavigationStack(
             )
         ) { backStackEntry ->
             QuizScreen(
-                quizId = backStackEntry.arguments?.getString("quizId") ?: ""
+                quizId = backStackEntry.arguments?.getString("quizId") ?: "",
+                onGoHome = { navController.popBackStack() }
             )
         }
     }
