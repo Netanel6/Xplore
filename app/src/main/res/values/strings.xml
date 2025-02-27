@@ -16,7 +16,7 @@
     <string name="user_not_found">לא נמצא חשבון תואם</string>
 
     <!-- 🎮 Quiz Section -->
-    <string name="select_quiz">בחר חידון והתחל לשחק</string>
+    <string name="select_quiz">🎲 בחר חידון והתחל לשחק</string>
     <string name="select_quiz_title">החידונים שלך</string>
     <string name="continue_to_quiz">המשך לחידון</string>
     <string name="try_again">🔄 נסה שוב</string>

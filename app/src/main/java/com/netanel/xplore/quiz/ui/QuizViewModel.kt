@@ -22,6 +22,12 @@ class QuizViewModel @Inject constructor(
     private val _currentQuestionIndex = MutableStateFlow(0)
     val currentQuestionIndex: StateFlow<Int> get() = _currentQuestionIndex
 
+    private val _showAnimation = MutableStateFlow(false)
+    val showAnimation: StateFlow<Boolean> get() = _showAnimation
+
+    private val _animationData = MutableStateFlow(AnimationData(0, false, ""))
+    val animationData: StateFlow<AnimationData> get() = _animationData
+
     fun loadQuiz(quizId: String) {
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
@@ -41,7 +47,8 @@ class QuizViewModel @Inject constructor(
             val question = questions[_currentQuestionIndex.value]
 
             if (!question.isAnswered) {
-                questions[_currentQuestionIndex.value] = question.copy(userSelectedAnswer = answerIndex)
+                questions[_currentQuestionIndex.value] =
+                    question.copy(userSelectedAnswer = answerIndex)
                 currentQuiz = quiz.copy(questions = questions)
                 _quizState.value = QuizState.Loaded(currentQuiz!!)
             }
@@ -66,9 +73,23 @@ class QuizViewModel @Inject constructor(
                     questions = questions,
                     totalScore = quiz.totalScore + pointsGained
                 )
+
+                // 🎉 Show animation before proceeding
+                _animationData.value = AnimationData(
+                    pointsGained,
+                    isCorrect,
+                    question.answers?.get(question.correctAnswerIndex ?: 0) ?: ""
+                )
+                _showAnimation.value = true
+
                 _quizState.value = QuizState.Loaded(currentQuiz!!)
             }
         }
+    }
+
+    fun hideAnimation() {
+        _showAnimation.value = false
+        nextQuestion()
     }
 
     fun nextQuestion() {
@@ -87,19 +108,31 @@ class QuizViewModel @Inject constructor(
     }
 
     fun resetQuiz() {
-        val quizId = currentQuiz?._id ?: return
-
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
             try {
-                val reloadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0)
-                currentQuiz = reloadedQuiz
+                val quizId = currentQuiz?._id ?: return@launch
+                val freshQuiz = repository.getQuiz(quizId).copy(
+                    totalScore = 0,
+                    questions = repository.getQuiz(quizId).questions.map { it.copy(
+                        userSelectedAnswer = null,
+                        isAnswered = false,
+                        pointsGained = 0
+                    ) }
+                )
+
+                currentQuiz = freshQuiz
                 _currentQuestionIndex.value = 0
-                _quizState.value = QuizState.Loaded(currentQuiz!!)
+                _quizState.value = QuizState.Loaded(freshQuiz)
             } catch (e: Exception) {
                 _quizState.value = QuizState.Error("Failed to reset quiz: ${e.message}")
             }
         }
     }
-
 }
+
+data class AnimationData(
+    val points: Int,
+    val isCorrect: Boolean,
+    val correctAnswer: String
+)

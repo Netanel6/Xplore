@@ -36,7 +36,8 @@ fun QuizQuestion(
     totalQuestions: Int,
     onAnswerSelected: (Int) -> Unit,
     onNextClicked: () -> Unit,
-    onPreviousClicked: () -> Unit
+    onPreviousClicked: () -> Unit,
+
 ) {
     val selectedAnswer = question.userSelectedAnswer
     val isAnswered = question.isAnswered
