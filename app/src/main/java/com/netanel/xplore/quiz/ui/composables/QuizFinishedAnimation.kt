@@ -16,7 +16,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun QuizFinishedAnimation(onAnimationEnd: () -> Unit) {
     LaunchedEffect(Unit) {
-        delay(3000L) // 🔥 Show animation for 3 seconds
+        delay(3000L)
         onAnimationEnd()
     }
 

@@ -46,8 +46,8 @@ fun QuizProgressIndicators(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val safeTotalTime = if (totalTime > 0) totalTime else 1
-        val safeLockTime = if (initialLockTime > 0) initialLockTime else 1
+        val safeTotalTime = if (totalTime > 0) totalTime else -1
+        val safeLockTime = if (initialLockTime > 0) initialLockTime else 10
 
         val quizProgress by animateFloatAsState(
             targetValue = currentTimeLeft.toFloat() / safeTotalTime,
@@ -55,38 +55,41 @@ fun QuizProgressIndicators(
             label = "QuizProgressAnimation"
         )
 
-        // **🔵 Quiz Timer Bar with Gradient & Glow**
-        val gradientBrush = ShaderBrush(
-            LinearGradientShader(
-                colors = listOf(
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                    MaterialTheme.colorScheme.primary
-                ),
-                from = androidx.compose.ui.geometry.Offset(0f, 0f),
-                to = androidx.compose.ui.geometry.Offset(400f, 0f),
-                tileMode = TileMode.Clamp
+        if (safeTotalTime != -1) {
+            // **🔵 Quiz Timer Bar with Gradient & Glow**
+            val gradientBrush = ShaderBrush(
+                LinearGradientShader(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        MaterialTheme.colorScheme.primary
+                    ),
+                    from = androidx.compose.ui.geometry.Offset(0f, 0f),
+                    to = androidx.compose.ui.geometry.Offset(400f, 0f),
+                    tileMode = TileMode.Clamp
+                )
             )
-        )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-        ) {
-            LinearProgressIndicator(
-                progress = { quizProgress },
-                modifier = Modifier.fillMaxSize(),
-                color = Color.Transparent, // Hide default color
-                trackColor = Color.Transparent
-            )
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(quizProgress)
-                    .fillMaxSize()
-                    .background(gradientBrush)
-            )
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+            ) {
+                LinearProgressIndicator(
+                    progress = { quizProgress },
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color.Transparent, // Hide default color
+                    trackColor = Color.Transparent
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(quizProgress)
+                        .fillMaxSize()
+                        .background(gradientBrush)
+                )
+            }
+
         }
 
         // **🔒 Pulsating Answer Lock Timer**
