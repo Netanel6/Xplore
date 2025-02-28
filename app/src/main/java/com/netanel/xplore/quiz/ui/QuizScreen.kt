@@ -1,5 +1,6 @@
 package com.netanel.xplore.quiz.ui
 
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,10 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,12 +27,7 @@ import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
 import com.netanel.xplore.quiz.ui.composables.QuizFinishedAnimation
 import com.netanel.xplore.quiz.ui.composables.QuizProgressIndicators
 import com.netanel.xplore.quiz.ui.composables.QuizQuestion
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import com.netanel.xplore.quiz.utils.QuizTimerManager
 
 @Composable
 fun QuizScreen(
@@ -51,61 +44,21 @@ fun QuizScreen(
     var showPointsAnimation by remember { mutableStateOf(false) }
     var quizCompleted by remember { mutableStateOf(false) }
     var showQuizFinishedAnimation by remember { mutableStateOf(false) }
-    var questionLocked by remember { mutableStateOf(true) }
-    var quizTimerPaused by remember { mutableStateOf(false) }
 
-    // ✅ Extract Quiz Timer when quiz is loaded
     val totalQuizTime = (quizState as? QuizState.Loaded)?.quiz?.timer ?: 60
-    var totalTimeLeft by remember { mutableIntStateOf(totalQuizTime) }
-    var answerLockTimeLeft by remember { mutableIntStateOf(10) }
-    var job: Job? by remember { mutableStateOf(null) } // Track timer coroutine
+    val timerManager = remember { QuizTimerManager(totalQuizTime) }
 
     val currentQuestion = (quizState as? QuizState.Loaded)?.quiz?.questions?.getOrNull(currentQuestionIndex)
 
-    // ✅ Detect Last Question
-    val isLastQuestion by remember(currentQuestionIndex, quizState) {
-        derivedStateOf {
-            val questions = (quizState as? QuizState.Loaded)?.quiz?.questions ?: emptyList()
-            currentQuestionIndex == questions.lastIndex
-        }
-    }
+    val totalTimeLeft by timerManager.totalTimeLeft.collectAsState()
+    val answerLockTimeLeft by timerManager.answerLockTimeLeft.collectAsState()
 
-    // ✅ Track Answer Lock Completion for Each Question
-    val answerLockCompleted = remember { mutableStateMapOf<Int, Boolean>() }
-
-    // **🔥 Global Quiz Timer**
     LaunchedEffect(Unit) {
-        job?.cancel()
-        job = CoroutineScope(Dispatchers.Default).launch {
-            while (totalTimeLeft > 0 && isActive) {
-                if (!quizTimerPaused) {
-                    delay(1000L)
-                    totalTimeLeft--
-                }
-            }
-            showQuizFinishedAnimation = true
-        }
+        timerManager.startQuizTimer { showQuizFinishedAnimation = true }
     }
 
-    // **🔐 Answer Lock Timer (Fix: Prevent Restart on Answered Questions)**
     LaunchedEffect(currentQuestionIndex) {
-        if (currentQuestion?.isAnswered == true || answerLockCompleted[currentQuestionIndex] == true) {
-            // ✅ If the question was already answered or lock already completed, don't lock again
-            questionLocked = false
-            answerLockTimeLeft = 0
-        } else {
-            // ✅ If it's a new question, start the answer lock timer
-            questionLocked = true
-            answerLockTimeLeft = 10
-            quizTimerPaused = true
-            while (answerLockTimeLeft > 0 && isActive) {
-                delay(1000L)
-                answerLockTimeLeft--
-            }
-            questionLocked = false
-            quizTimerPaused = false
-            answerLockCompleted[currentQuestionIndex] = true
-        }
+        timerManager.startAnswerLockTimer(currentQuestionIndex) {}
     }
 
     when (quizState) {
@@ -123,10 +76,10 @@ fun QuizScreen(
                 quizCompleted = quizCompleted,
                 showPointsAnimation = showPointsAnimation,
                 showQuizFinishedAnimation = showQuizFinishedAnimation,
-                isPreviousEnabled = currentQuestionIndex > 0 && !questionLocked,
-                isNextEnabled = !questionLocked || currentQuestion?.isAnswered == true,
+                isPreviousEnabled = currentQuestionIndex > 0 && !timerManager.isAnswerLocked,
+                isNextEnabled = !timerManager.isAnswerLocked || currentQuestion?.isAnswered == true,
                 isAnswered = currentQuestion?.isAnswered ?: false,
-                questionLocked = questionLocked,
+                questionLocked = timerManager.isAnswerLocked,
                 answerLockTimeLeft = answerLockTimeLeft
             )
 
@@ -136,7 +89,6 @@ fun QuizScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // ✅ Show Progress Bar
                 if (!showQuizFinishedAnimation && !quizCompleted && !showPointsAnimation) {
                     QuizProgressIndicators(
                         currentTimeLeft = totalTimeLeft,
@@ -149,7 +101,6 @@ fun QuizScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 when {
-                    // ✅ Quiz Finished Animation
                     showQuizFinishedAnimation -> {
                         QuizFinishedAnimation(
                             onAnimationEnd = {
@@ -159,7 +110,6 @@ fun QuizScreen(
                         )
                     }
 
-                    // ✅ Points Animation
                     showPointsAnimation -> {
                         PointsAnimationScreen(
                             points = currentQuestion?.pointsGained ?: 0,
@@ -167,7 +117,7 @@ fun QuizScreen(
                             correctAnswer = currentQuestion?.answers?.get(currentQuestion.correctAnswerIndex ?: 0).toString(),
                             onAnimationEnd = {
                                 showPointsAnimation = false
-                                if (isLastQuestion) {
+                                if (currentQuestionIndex == questions.lastIndex) {
                                     quizCompleted = true
                                 } else {
                                     viewModel.nextQuestion()
@@ -176,17 +126,14 @@ fun QuizScreen(
                         )
                     }
 
-                    // ✅ Quiz End Screen
                     quizCompleted -> {
                         QuizEndScreen(
                             totalScore = quiz.totalScore,
                             onTryAgain = {
                                 quizCompleted = false
                                 showPointsAnimation = false
-                                totalTimeLeft = totalQuizTime
-                                answerLockTimeLeft = 10
-                                questionLocked = true
-                                answerLockCompleted.clear()
+                                timerManager.resetQuizTimer()
+                                timerManager.resetAnswerLock()
                                 viewModel.resetQuiz()
                             },
                             onGoHome = { onGoHome() }
@@ -204,7 +151,7 @@ fun QuizScreen(
                                 }
                             },
                             onNextClicked = {
-                                if (!questionLocked && currentQuestion?.userSelectedAnswer != null && !currentQuestion.isAnswered) {
+                                if (!timerManager.isAnswerLocked && currentQuestion?.userSelectedAnswer != null && !currentQuestion.isAnswered) {
                                     viewModel.lockAnswer()
                                     showPointsAnimation = true
                                 } else {

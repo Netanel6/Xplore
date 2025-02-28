@@ -50,7 +50,6 @@ fun QuizNavigationBar(
     }
 }
 
-// 🔹 Define button types for extensibility
 sealed class QuizNavButtonType(val labelRes: Int) {
     data object Previous : QuizNavButtonType(R.string.previous_question)
     data object Next : QuizNavButtonType(R.string.submit)
