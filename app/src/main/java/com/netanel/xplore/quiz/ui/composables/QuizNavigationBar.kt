@@ -3,12 +3,8 @@ package com.netanel.xplore.quiz.ui.composables
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,37 +18,40 @@ import com.netanel.xplore.ui.theme.OnPrimary
 fun QuizNavigationBar(
     onPreviousClicked: () -> Unit,
     onNextClicked: () -> Unit,
-    isNextEnabled: Boolean
+    isNextEnabled: Boolean,
+    isPreviousEnabled: Boolean
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 🔹 Previous Button
-        IconButton(onClick = { onPreviousClicked() }) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = stringResource(R.string.previous_question),
-                tint = OnPrimary
-            )
-        }
-
-        // 🔹 Quiz Timer Placeholder
-        Text(
-            text = stringResource(R.string.quiz_timer),
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-        )
-
-        // 🔹 Submit / Next Button
-        Button(
-            onClick = { onNextClicked() },
-            colors = ButtonDefaults.buttonColors(containerColor = OnPrimary),
-            enabled = isNextEnabled
-        ) {
-            Text(stringResource(R.string.submit), color = MaterialTheme.colorScheme.onPrimary)
+        listOf(
+            QuizNavButtonType.Previous to isPreviousEnabled,
+            QuizNavButtonType.Next to isNextEnabled
+        ).forEach { (buttonType, isEnabled) ->
+            Button(
+                onClick = {
+                    when (buttonType) {
+                        QuizNavButtonType.Previous -> onPreviousClicked()
+                        QuizNavButtonType.Next -> onNextClicked()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = OnPrimary),
+                enabled = isEnabled,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = stringResource(buttonType.labelRes),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
+}
+
+// 🔹 Define button types for extensibility
+sealed class QuizNavButtonType(val labelRes: Int) {
+    data object Previous : QuizNavButtonType(R.string.previous_question)
+    data object Next : QuizNavButtonType(R.string.submit)
 }

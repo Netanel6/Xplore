@@ -1,138 +1,49 @@
 package com.netanel.xplore.quiz.ui.composables
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.netanel.xplore.R
-import com.netanel.xplore.quiz.model.Question
-import com.netanel.xplore.ui.theme.AnswerBorder
-import com.netanel.xplore.ui.theme.AnswerUnselected
-import com.netanel.xplore.ui.theme.BackgroundLight
-import com.netanel.xplore.ui.theme.OnPrimary
-import com.netanel.xplore.ui.theme.OnSecondary
-import com.netanel.xplore.ui.theme.SoftWhite
+import com.netanel.xplore.quiz.ui.QuizUIState
 
 @Composable
 fun QuizQuestion(
-    question: Question,
-    currentQuestionNumber: Int,
-    totalQuestions: Int,
+    uiState: QuizUIState,
     onAnswerSelected: (Int) -> Unit,
-    onNextClicked: () -> Unit,
     onPreviousClicked: () -> Unit,
-
+    onNextClicked: () -> Unit
 ) {
-    val selectedAnswer = question.userSelectedAnswer
-    val isAnswered = question.isAnswered
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.Top
     ) {
+        // 🔹 Question Card
+        QuestionCard(uiState)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 🔹 Answer Options
+        AnswerOptions(
+            question = uiState.currentQuestion,
+            isAnswered = uiState.isAnswered,
+            onAnswerSelected = onAnswerSelected
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // 🔹 Navigation Bar
         QuizNavigationBar(
             onPreviousClicked = onPreviousClicked,
-            onNextClicked = { if (selectedAnswer != null) onNextClicked() },
-            isNextEnabled = selectedAnswer != null || isAnswered
-        )
-
-        // 🔹 Progress Indicators
-        QuizProgressIndicators(currentQuestionNumber, totalQuestions)
-
-        // 🔹 Question Card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = BackgroundLight),
-            elevation = CardDefaults.cardElevation(6.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = stringResource(R.string.question_number, currentQuestionNumber, totalQuestions),
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    color = OnPrimary
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = question.text.orEmpty(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = OnSecondary
-                )
-            }
-        }
-
-        // 🔹 Answer Options
-        Column(modifier = Modifier.fillMaxWidth()) {
-            question.answers?.forEachIndexed { index, answer ->
-                val isSelected = selectedAnswer == index
-                AnswerButton(
-                    answer = answer,
-                    isSelected = isSelected,
-                    isLocked = isAnswered,
-                    onClick = { if (!isAnswered) onAnswerSelected(index) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun AnswerButton(
-    answer: String,
-    isSelected: Boolean,
-    isLocked: Boolean,
-    onClick: () -> Unit
-) {
-    val containerColor = when {
-        isSelected ->  AnswerUnselected// ⚪ Selected Answer (Blue)
-        else -> OnPrimary // 🔵 Default Unselected Answer (Soft Gray)
-    }
-
-    val contentColor = when {
-        isSelected -> SoftWhite
-        else -> OnPrimary
-    }
-
-    Button(
-        onClick = { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor
-        ),
-        border = if (!isSelected) BorderStroke(2.dp, AnswerBorder) else BorderStroke(2.dp, OnPrimary),
-        enabled = !isLocked
-    ) {
-        Text(
-            text = answer,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-            color = if (isSelected) OnPrimary else SoftWhite,
+            onNextClicked = onNextClicked,
+            isPreviousEnabled = uiState.isPreviousEnabled,
+            isNextEnabled = uiState.isNextEnabled
         )
     }
 }

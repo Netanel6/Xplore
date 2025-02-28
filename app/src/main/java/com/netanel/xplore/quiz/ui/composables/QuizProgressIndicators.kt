@@ -1,45 +1,86 @@
 package com.netanel.xplore.quiz.ui.composables
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.netanel.xplore.ui.theme.OnPrimary
+import com.netanel.xplore.R
+import com.netanel.xplore.ui.AnimatedComposable
 
 @Composable
 fun QuizProgressIndicators(
-    currentQuestionNumber: Int,
-    totalQuestions: Int
+    currentTimeLeft: Int,
+    totalTime: Int,
+    answerLockTimeLeft: Int,
+    initialLockTime: Int
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        repeat(totalQuestions) { index ->
-            val isAnswered = index < currentQuestionNumber
-            Box(
-                modifier = Modifier
-                    .size(20.dp)
-                    .background(
-                        color = if (isAnswered) OnPrimary else MaterialTheme.colorScheme.surfaceVariant,
-                        shape = CircleShape
+        // **⏳ Total Quiz Timer Progress**
+        Text(
+            text = stringResource(R.string.quiz_timer_text, currentTimeLeft),
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        val quizProgress by animateFloatAsState(
+            targetValue = currentTimeLeft.toFloat() / totalTime,
+            animationSpec = tween(durationMillis = 500),
+            label = "QuizProgressAnimation"
+        )
+
+        LinearProgressIndicator(
+            progress = { quizProgress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(12.dp)
+                .padding(horizontal = 8.dp),
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        // **🔐 Answer Lock Timer (Using AnimatedComposable)**
+        AnimatedComposable(isVisible = answerLockTimeLeft > 0,
+            content = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.answer_unlock_text, answerLockTimeLeft),
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.secondary
                     )
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        shape = CircleShape
+
+                    val answerLockProgress by animateFloatAsState(
+                        targetValue = answerLockTimeLeft.toFloat() / initialLockTime,
+                        animationSpec = tween(durationMillis = 500),
+                        label = "AnswerLockProgressAnimation"
                     )
-                    .padding(4.dp)
-            )
-        }
+
+                    LinearProgressIndicator(
+                        progress = { answerLockProgress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .padding(horizontal = 8.dp),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            })
     }
 }

@@ -20,6 +20,7 @@
     <string name="select_quiz_title">החידונים שלך</string>
     <string name="continue_to_quiz">המשך לחידון</string>
     <string name="try_again">🔄 נסה שוב</string>
+    <string name="times_up">נגמר הזמן</string>
     <string name="retry">נסה שוב</string>
     <string name="logout">🚪 התנתקות</string>
 
@@ -33,5 +34,8 @@
     <string name="next_question">לשאלה הבאה</string>
     <string name="previous_question">שאלה קודמת</string>
     <string name="submit">לשאלה הבאה</string>
-    <string name="quiz_timer">⏳ 01:14</string>
+
+    <!-- ⏳ Timer & Lock -->
+    <string name="quiz_timer_text">⏳ זמן חידון נותר: %1$d שניות</string>
+    <string name="answer_unlock_text">🔒 תשובות יפתחו בעוד %1$d שניות</string>
 </resources>
