@@ -12,7 +12,7 @@ import com.netanel.xplore.quiz.model.Question
 @Composable
 fun AnswerOptions(
     question: Question?,
-    isAnswered: Boolean,
+    isLocked: Boolean,
     onAnswerSelected: (Int) -> Unit
 ) {
     Column(
@@ -24,8 +24,8 @@ fun AnswerOptions(
             AnswerButton(
                 answer = answer,
                 isSelected = isSelected,
-                isLocked = isAnswered,
-                onClick = { if (!isAnswered) onAnswerSelected(index) }
+                isLocked = isLocked,
+                onClick = { if (!isLocked) onAnswerSelected(index) }
             )
         }
     }

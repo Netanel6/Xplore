@@ -29,10 +29,10 @@ fun QuizQuestion(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🔹 Answer Options
+        // 🔹 Pass `isLocked` instead of `isAnswered`
         AnswerOptions(
             question = uiState.currentQuestion,
-            isAnswered = uiState.isAnswered,
+            isLocked = uiState.questionLocked,
             onAnswerSelected = onAnswerSelected
         )
 
