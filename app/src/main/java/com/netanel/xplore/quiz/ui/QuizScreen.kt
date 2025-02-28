@@ -1,6 +1,5 @@
 package com.netanel.xplore.quiz.ui
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,20 +44,35 @@ fun QuizScreen(
     var quizCompleted by remember { mutableStateOf(false) }
     var showQuizFinishedAnimation by remember { mutableStateOf(false) }
 
-    val totalQuizTime = (quizState as? QuizState.Loaded)?.quiz?.timer ?: 60
+    // ✅ Load totalQuizTime from API and ensure correct initial value
+    var totalQuizTime by remember { mutableStateOf(0) }
+
+    LaunchedEffect(quizState) {
+        if (quizState is QuizState.Loaded) {
+            val loadedQuiz = (quizState as QuizState.Loaded).quiz
+            totalQuizTime = loadedQuiz.timer
+        }
+    }
+
+    // ✅ **Keep a stable instance of QuizTimerManager**
     val timerManager = remember { QuizTimerManager(totalQuizTime) }
 
-    val currentQuestion = (quizState as? QuizState.Loaded)?.quiz?.questions?.getOrNull(currentQuestionIndex)
+    LaunchedEffect(totalQuizTime) {
+        if (totalQuizTime > 0) {
+            timerManager.updateTotalTime(totalQuizTime)
+        }
+    }
 
     val totalTimeLeft by timerManager.totalTimeLeft.collectAsState()
     val answerLockTimeLeft by timerManager.answerLockTimeLeft.collectAsState()
 
-    LaunchedEffect(Unit) {
-        timerManager.startQuizTimer { showQuizFinishedAnimation = true }
-    }
+    val currentQuestion = (quizState as? QuizState.Loaded)?.quiz?.questions?.getOrNull(currentQuestionIndex)
 
+    // ✅ Ensure Answer Lock Timer Controls the Quiz Timer Start
     LaunchedEffect(currentQuestionIndex) {
-        timerManager.startAnswerLockTimer(currentQuestionIndex) {}
+        timerManager.startAnswerLockTimer(currentQuestionIndex) {
+            timerManager.startQuizTimer { showQuizFinishedAnimation = true }
+        }
     }
 
     when (quizState) {
@@ -77,12 +91,11 @@ fun QuizScreen(
                 showPointsAnimation = showPointsAnimation,
                 showQuizFinishedAnimation = showQuizFinishedAnimation,
                 isPreviousEnabled = currentQuestionIndex > 0 && !timerManager.isAnswerLocked,
-                isNextEnabled = !timerManager.isAnswerLocked || currentQuestion?.isAnswered == true,
+                isNextEnabled = currentQuestion?.userSelectedAnswer != null,
                 isAnswered = currentQuestion?.isAnswered ?: false,
                 questionLocked = timerManager.isAnswerLocked,
                 answerLockTimeLeft = answerLockTimeLeft
             )
-
 
             Column(
                 modifier = Modifier
@@ -137,7 +150,11 @@ fun QuizScreen(
                                 timerManager.resetAnswerLock()
                                 viewModel.resetQuiz()
                             },
-                            onGoHome = { onGoHome() }
+                            onGoHome = {
+                                timerManager.resetQuizTimer()
+                                timerManager.resetAnswerLock()
+                                onGoHome()
+                            }
                         )
                     }
 

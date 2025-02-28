@@ -10,7 +10,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class QuizTimerManager(
-    private val totalQuizTime: Int,
+    private var totalQuizTime: Int,  // ✅ Changed to var to allow updates
     private val answerLockDuration: Int = 10
 ) {
     private var quizTimerJob: Job? = null
@@ -30,6 +30,11 @@ class QuizTimerManager(
 
     var isAnswerLocked = true
         private set
+
+    fun updateTotalTime(newTotalTime: Int) {  // ✅ Add this function
+        totalQuizTime = newTotalTime
+        _totalTimeLeft.value = newTotalTime
+    }
 
     fun startQuizTimer(onFinish: () -> Unit) {
         quizTimerJob?.cancel()
