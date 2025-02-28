@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,12 +46,12 @@ fun QuizScreen(
     var showQuizFinishedAnimation by remember { mutableStateOf(false) }
 
     // ✅ Load totalQuizTime from API and ensure correct initial value
-    var totalQuizTime by remember { mutableStateOf(0) }
+    var totalQuizTime by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(quizState) {
         if (quizState is QuizState.Loaded) {
             val loadedQuiz = (quizState as QuizState.Loaded).quiz
-            totalQuizTime = loadedQuiz.timer
+            totalQuizTime = loadedQuiz.quizTimer
         }
     }
 
@@ -71,7 +72,7 @@ fun QuizScreen(
     // ✅ Ensure Answer Lock Timer Controls the Quiz Timer Start
     LaunchedEffect(currentQuestionIndex) {
         timerManager.startAnswerLockTimer(currentQuestionIndex) {
-            timerManager.startQuizTimer { showQuizFinishedAnimation = true }
+            timerManager.startQuizTimer { showQuizFinishedAnimation = false }
         }
     }
 
@@ -108,7 +109,7 @@ fun QuizScreen(
                         currentTimeLeft = totalTimeLeft,
                         totalTime = totalQuizTime,
                         answerLockTimeLeft = answerLockTimeLeft,
-                        initialLockTime = 10
+                        initialLockTime = quiz.answerLockTimer
                     )
                 }
 
