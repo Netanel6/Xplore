@@ -5,6 +5,5 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "quizzes")
 data class QuizEntity(
-    @PrimaryKey val id: String,
-    val title: String
+    @PrimaryKey val id: String
 )
