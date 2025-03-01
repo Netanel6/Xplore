@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -47,11 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
-import com.netanel.xplore.auth.repository.model.User
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
+import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.OnPrimary
 import com.netanel.xplore.ui.theme.SoftWhite
+import com.netanel.xplore.utils.formatTime
 import kotlinx.coroutines.delay
 
 @Composable
@@ -67,9 +66,9 @@ fun HomeScreen(
     var showQuizList by remember { mutableStateOf(false) }
     var isUiVisible by remember { mutableStateOf(false) }
 
-    // 🌟 Fade-in Animation
-    LaunchedEffect(Unit) {
-        homeViewModel.fetchQuizzes(userId)
+    // 🌟 Fetch quizzes for user when screen loads
+    LaunchedEffect(userId) {
+        homeViewModel.fetchUserQuizzes(userId)
         delay(300)
         isUiVisible = true
     }
@@ -173,7 +172,7 @@ fun HomeScreen(
 
 @Composable
 fun QuizList(
-    quizzes: List<User.Quiz>,
+    quizzes: List<Quiz>,
     onQuizSelected: (String) -> Unit,
     onClose: () -> Unit
 ) {
@@ -218,7 +217,7 @@ fun QuizList(
                     val quiz = quizzes[index]
                     QuizListItem(
                         quiz = quiz,
-                        onClick = { onQuizSelected(quiz.id) },
+                        onClick = { onQuizSelected(quiz._id) },
                         backgroundColor = if (index % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
@@ -228,7 +227,11 @@ fun QuizList(
 }
 
 @Composable
-fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit, backgroundColor: Color) {
+fun QuizListItem(
+    quiz: Quiz,
+    onClick: () -> Unit,
+    backgroundColor: Color
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,23 +241,47 @@ fun QuizListItem(quiz: User.Quiz, onClick: () -> Unit, backgroundColor: Color) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.question_mark),
-                contentDescription = "Quiz icon",
-                tint = OnPrimary,
-                modifier = Modifier.size(24.dp)
+            // 🏷 Quiz Title
+            Text(
+                text = quiz.title ?: "חידון ללא שם",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = OnPrimary
+                )
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
+
+            // 🔢 Number of Questions
+            Text(
+                text = "שאלות: ${quiz.questions.size}",
+                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            )
+
+            // ⏳ Quiz Timer
+            if (quiz.quizTimer > 0) {
                 Text(
-                    text = quiz.title,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = OnPrimary)
+                    text = "⏳ זמן חידון: ${quiz.quizTimer.formatTime()}",
+                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                )
+            }
+
+            // 🔒 Answer Lock Timer
+            if (quiz.answerLockTimer > 0) {
+                Text(
+                    text = "🔒 זמן נעילת תשובות: ${quiz.answerLockTimer.formatTime()}",
+                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                )
+            }
+
+            // ✏️ Quiz Creator (if available)
+            quiz.creatorId?.let {
+                Text(
+                    text = "✍️ נוצר ע\"י: $it",
+                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
             }
         }

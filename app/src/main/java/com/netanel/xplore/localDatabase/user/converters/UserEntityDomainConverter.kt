@@ -10,7 +10,7 @@ fun User.toEntity(): UserEntity {
         name = this.name,
         phoneNumber = this.phoneNumber,
         token = this.token,
-        quizzes = this.quizzes.map { QuizEntity(it.id, it.title) }
+        quizzes = this.quizzes.map { QuizEntity(it.id) }
     )
 }
 
@@ -20,7 +20,7 @@ fun UserEntity.toDomain(): User {
         name = this.name,
         phoneNumber = this.phoneNumber,
         token = this.token,
-        quizzes = this.quizzes.map { User.Quiz(it.id, it.title) }
+        quizzes = this.quizzes.map { User.Quiz(it.id) }
     )
 }
 

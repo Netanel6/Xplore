@@ -21,7 +21,6 @@ data class User(
 ) {
     @Serializable
     data class Quiz(
-        val id: String,
-        val title: String
+        val id: String
     )
 }

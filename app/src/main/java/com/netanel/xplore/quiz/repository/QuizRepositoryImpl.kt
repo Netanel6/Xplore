@@ -1,6 +1,5 @@
 package com.netanel.xplore.quiz.repository
 
-import com.netanel.xplore.auth.repository.model.User
 import com.netanel.xplore.quiz.data.QuizApi
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
@@ -39,12 +38,15 @@ class QuizRepositoryImpl(private val api: QuizApi): QuizRepository {
         }
     }
 
-    override suspend fun getQuizListForUser(userId: String): List<User.Quiz> {
+    override suspend fun getQuizListForUser(userId: String): List<Quiz> {
         val response = api.getUserQuizList(userId)
         if (response.status == "success" && response.data != null) {
-            return response.data
+            return response.data.map { quizId ->
+                getQuiz(quizId.id)
+            }
         } else {
             throw Exception(response.message ?: "Unknown error")
         }
     }
+
 }
