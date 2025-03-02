@@ -7,13 +7,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,51 +46,18 @@ fun QuizProgressIndicators(
         val safeLockTime = if (initialLockTime > 0) initialLockTime else 10
 
         val quizProgress by animateFloatAsState(
-            targetValue = currentTimeLeft.toFloat() / safeTotalTime,
+            targetValue = if (safeTotalTime > 0) currentTimeLeft.toFloat() / safeTotalTime else 0f,
             animationSpec = tween(durationMillis = 500),
             label = "QuizProgressAnimation"
         )
 
-        if (safeTotalTime != -1) {
-            // **🔵 Quiz Timer Bar with Gradient & Glow**
-            val gradientBrush = ShaderBrush(
-                LinearGradientShader(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                        MaterialTheme.colorScheme.primary
-                    ),
-                    from = androidx.compose.ui.geometry.Offset(0f, 0f),
-                    to = androidx.compose.ui.geometry.Offset(400f, 0f),
-                    tileMode = TileMode.Clamp
-                )
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-            ) {
-                LinearProgressIndicator(
-                    progress = { quizProgress },
-                    modifier = Modifier.fillMaxSize(),
-                    color = Color.Transparent, // Hide default color
-                    trackColor = Color.Transparent
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(quizProgress)
-                        .fillMaxSize()
-                        .background(gradientBrush)
-                )
-            }
-
+        if (safeTotalTime > 0) {
+            QuizTimerProgressBar(progress = quizProgress)
         }
 
-        // **🔒 Pulsating Answer Lock Timer**
+        // 🔒 **Pulsating Answer Lock Timer**
         val answerLockProgress by animateFloatAsState(
-            targetValue = answerLockTimeLeft.toFloat() / safeLockTime,
+            targetValue = if (safeLockTime > 0) answerLockTimeLeft.toFloat() / safeLockTime else 0f,
             animationSpec = tween(durationMillis = 500),
             label = "AnswerLockProgressAnimation"
         )
@@ -124,5 +87,32 @@ fun QuizProgressIndicators(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun GradientProgressBar(progress: Float) {
+    val gradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+            MaterialTheme.colorScheme.primary
+        ),
+        startX = 0f,
+        endX = 400f
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(14.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(progress)
+                .fillMaxHeight()
+                .background(gradientBrush)
+        )
     }
 }

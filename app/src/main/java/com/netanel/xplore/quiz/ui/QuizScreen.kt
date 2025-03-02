@@ -28,7 +28,6 @@ import com.netanel.xplore.quiz.ui.composables.QuizFinishedAnimation
 import com.netanel.xplore.quiz.ui.composables.QuizProgressIndicators
 import com.netanel.xplore.quiz.ui.composables.QuizQuestion
 import com.netanel.xplore.quiz.utils.QuizTimerManager
-
 @Composable
 fun QuizScreen(
     quiz: Quiz,
@@ -45,7 +44,6 @@ fun QuizScreen(
     var quizCompleted by remember { mutableStateOf(false) }
     var showQuizFinishedAnimation by remember { mutableStateOf(false) }
 
-    // ✅ Load totalQuizTime from API and ensure correct initial value
     var totalQuizTime by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(quizState) {
@@ -55,7 +53,6 @@ fun QuizScreen(
         }
     }
 
-    // ✅ **Keep a stable instance of QuizTimerManager**
     val timerManager = remember { QuizTimerManager(totalQuizTime) }
 
     LaunchedEffect(totalQuizTime) {
@@ -66,13 +63,20 @@ fun QuizScreen(
 
     val totalTimeLeft by timerManager.totalTimeLeft.collectAsState()
     val answerLockTimeLeft by timerManager.answerLockTimeLeft.collectAsState()
-
     val currentQuestion = (quizState as? QuizState.Loaded)?.quiz?.questions?.getOrNull(currentQuestionIndex)
 
-    // ✅ Ensure Answer Lock Timer Controls the Quiz Timer Start
     LaunchedEffect(currentQuestionIndex) {
         timerManager.startAnswerLockTimer(currentQuestionIndex) {
             timerManager.startQuizTimer { showQuizFinishedAnimation = false }
+        }
+    }
+
+    LaunchedEffect(currentQuestionIndex, totalTimeLeft) {
+        val isLastQuestionAnswered = currentQuestionIndex == (quizState as? QuizState.Loaded)?.quiz?.questions?.lastIndex
+                && (quizState as? QuizState.Loaded)?.quiz?.questions?.all { it.isAnswered } == true
+
+        if (isLastQuestionAnswered || totalTimeLeft <= 0) {
+            quizCompleted = true
         }
     }
 
@@ -127,7 +131,7 @@ fun QuizScreen(
 
                     showPointsAnimation -> {
                         PointsAnimationScreen(
-                            points = currentQuestion?.pointsGained ?: 0,
+                            points = currentQuestion?.points ?: 0,
                             isCorrect = currentQuestion?.isCorrect ?: false,
                             correctAnswer = currentQuestion?.answers?.get(currentQuestion.correctAnswerIndex ?: 0).toString(),
                             onAnimationEnd = {

@@ -33,11 +33,13 @@
 
     <!-- 📖 Quiz Question Strings -->
     <string name="question_number">שאלה %1$d מתוך %2$d</string>
+    <string name="questions">שאלות: %1$d</string>
     <string name="next_question">לשאלה הבאה</string>
     <string name="previous_question">שאלה קודמת</string>
     <string name="submit">לשאלה הבאה</string>
 
     <!-- ⏳ Timer & Lock -->
     <string name="quiz_timer_text">⏳ זמן חידון נותר: %1$d שניות</string>
+    <string name="quiz_time_text">⏳ זמן חידון: %1$d %1$s</string>
     <string name="answer_unlock_text">🔒 תשובות יפתחו בעוד %1$d שניות</string>
 </resources>
