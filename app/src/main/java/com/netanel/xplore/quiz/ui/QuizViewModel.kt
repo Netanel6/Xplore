@@ -63,11 +63,11 @@ class QuizViewModel @Inject constructor(
 
             if (!question.isAnswered && question.userSelectedAnswer != null) {
                 val isCorrect = question.userSelectedAnswer == question.correctAnswerIndex
-                val pointsGained = if (isCorrect) question.pointsGained else 0
+                val pointsGained = if (isCorrect) question.points else 0
 
                 questions[_currentQuestionIndex.value] = question.copy(
                     isAnswered = true,
-                    pointsGained = pointsGained,
+                    points = pointsGained,
                     isCorrect = isCorrect
                 )
                 currentQuiz = quiz.copy(
@@ -118,7 +118,7 @@ class QuizViewModel @Inject constructor(
                     questions = repository.getQuiz(quizId).questions.map { it.copy(
                         userSelectedAnswer = null,
                         isAnswered = false,
-                        pointsGained = 0
+                        points = 0
                     ) }
                 )
 

@@ -33,10 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
+import com.netanel.xplore.home.ui.composables.QuizList
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.quiz.model.Quiz
-import com.netanel.xplore.home.ui.composables.QuizList
-
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.OnPrimary
 import com.netanel.xplore.ui.theme.SoftWhite
@@ -51,7 +50,7 @@ fun HomeScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val quizList by homeViewModel.quizList.collectAsState()
-    val username by userViewModel.username.collectAsState(initial = "")
+    val username by userViewModel.username.collectAsState()
     var showQuizList by remember { mutableStateOf(false) }
     var isUiVisible by remember { mutableStateOf(false) }
 
@@ -77,7 +76,7 @@ fun HomeScreen(
             // 🔹 Welcome Text
             AnimatedComposable(
                 isVisible = isUiVisible,
-                enter = fadeIn(animationSpec = tween(1000)),
+                enter = fadeIn(animationSpec = tween(1500)),
                 content = {
                     Text(
                         text = stringResource(R.string.welcome_back, username),

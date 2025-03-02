@@ -5,7 +5,6 @@ import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.utils.ServerResponse
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface QuizApi {

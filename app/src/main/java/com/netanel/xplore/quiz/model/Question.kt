@@ -10,7 +10,7 @@ data class Question(
     val correctAnswerIndex: Int? = null,
     var userSelectedAnswer: Int? = null,
     var isAnswered: Boolean = false,
-    var pointsGained: Int = 0,
+    var points: Int = 0,
     var isCorrect: Boolean = false
 ) {
 
