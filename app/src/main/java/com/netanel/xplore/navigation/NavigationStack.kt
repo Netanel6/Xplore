@@ -11,8 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.netanel.xplore.auth.ui.AuthScreen
-import com.netanel.xplore.home.HomeScreen
-import com.netanel.xplore.home.HomeViewModel
+import com.netanel.xplore.home.ui.HomeScreen
+import com.netanel.xplore.home.ui.HomeViewModel
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.quiz.ui.QuizErrorScreen
 import com.netanel.xplore.quiz.ui.QuizScreen

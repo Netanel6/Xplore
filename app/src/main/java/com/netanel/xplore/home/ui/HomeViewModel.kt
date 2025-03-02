@@ -1,4 +1,4 @@
-package com.netanel.xplore.home
+package com.netanel.xplore.home.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

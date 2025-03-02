@@ -7,7 +7,6 @@ data class Quiz(
     var _id: String = "",
     var questions: List<Question>,
     val quizTimer: Int,
-    //New
     val answerLockTimer: Int,
     val title: String? = null,
     val creatorId: String? = null,
