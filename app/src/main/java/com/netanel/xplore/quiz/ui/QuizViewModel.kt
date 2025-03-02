@@ -28,12 +28,13 @@ class QuizViewModel @Inject constructor(
     private val _animationData = MutableStateFlow(AnimationData(0, false, ""))
     val animationData: StateFlow<AnimationData> get() = _animationData
 
-    fun loadQuiz(quizId: String) {
+    fun loadQuiz(quiz: Quiz) {
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
             try {
-                val loadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0)
-                currentQuiz = loadedQuiz
+                /*val loadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0)
+                currentQuiz = loadedQuiz*/
+                currentQuiz = quiz
                 _quizState.value = QuizState.Loaded(currentQuiz!!)
             } catch (e: Exception) {
                 _quizState.value = QuizState.Error("Failed to load quiz: ${e.message}")

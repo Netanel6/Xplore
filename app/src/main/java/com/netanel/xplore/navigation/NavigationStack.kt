@@ -12,14 +12,19 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.netanel.xplore.auth.ui.AuthScreen
 import com.netanel.xplore.home.HomeScreen
+import com.netanel.xplore.home.HomeViewModel
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
+import com.netanel.xplore.quiz.ui.QuizErrorScreen
 import com.netanel.xplore.quiz.ui.QuizScreen
 import com.netanel.xplore.ui.SplashScreen
 
 @Composable
 fun NavigationStack(
-    userViewModel: UserViewModel = hiltViewModel()
+    userViewModel: UserViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
+    val selectedQuiz by homeViewModel.selectedQuiz.collectAsState()
+
     val navController = rememberNavController()
     val user by userViewModel.userFlow.collectAsState(initial = null)
     val isLoading by userViewModel.isLoading.collectAsState()
@@ -77,8 +82,9 @@ fun NavigationStack(
             HomeScreen(
                 userId = userId,
                 userViewModel = userViewModel,
-                onQuizSelected = { quizId ->
-                    navController.navigate("${Screen.QuizScreen.route}/$userId/$quizId")
+                onQuizSelected = { quiz ->
+                    homeViewModel.setSelectedQuiz(quiz)
+                    navController.navigate(Screen.QuizScreen.route)
                 },
                 onLogoutClicked = { userViewModel.logout() }
             )
@@ -86,16 +92,16 @@ fun NavigationStack(
 
         /** 🔹 Quiz Screen */
         composable(
-            route = "${Screen.QuizScreen.route}/{userId}/{quizId}",
+            route = Screen.QuizScreen.route,
             arguments = listOf(
-                navArgument("userId") { type = NavType.StringType },
-                navArgument("quizId") { type = NavType.StringType }
             )
-        ) { backStackEntry ->
-            QuizScreen(
-                quizId = backStackEntry.arguments?.getString("quizId") ?: "",
-                onGoHome = { navController.popBackStack() }
-            )
+        ) {
+            selectedQuiz?.let { quiz ->
+                QuizScreen(
+                    quiz = quiz,
+                    onGoHome = { navController.popBackStack() }
+                )
+            } ?: QuizErrorScreen("Couldn't find a valid quiz")
         }
     }
 

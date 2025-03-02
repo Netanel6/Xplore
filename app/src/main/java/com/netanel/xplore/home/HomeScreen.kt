@@ -56,7 +56,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomeScreen(
     userId: String,
-    onQuizSelected: (String) -> Unit,
+    onQuizSelected: (Quiz) -> Unit,
     onLogoutClicked: () -> Unit,
     homeViewModel: HomeViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
@@ -173,7 +173,7 @@ fun HomeScreen(
 @Composable
 fun QuizList(
     quizzes: List<Quiz>,
-    onQuizSelected: (String) -> Unit,
+    onQuizSelected: (Quiz) -> Unit,
     onClose: () -> Unit
 ) {
     Card(
@@ -217,7 +217,7 @@ fun QuizList(
                     val quiz = quizzes[index]
                     QuizListItem(
                         quiz = quiz,
-                        onClick = { onQuizSelected(quiz._id) },
+                        onClick = { onQuizSelected(quiz) },
                         backgroundColor = if (index % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant
                     )
                 }

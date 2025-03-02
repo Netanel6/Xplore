@@ -31,12 +31,12 @@ import com.netanel.xplore.quiz.utils.QuizTimerManager
 
 @Composable
 fun QuizScreen(
-    quizId: String,
+    quiz: Quiz,
     viewModel: QuizViewModel = hiltViewModel(),
     onGoHome: () -> Unit
 ) {
-    LaunchedEffect(quizId) {
-        viewModel.loadQuiz(quizId)
+    LaunchedEffect(quiz) {
+        viewModel.loadQuiz(quiz)
     }
 
     val quizState by viewModel.quizState.collectAsState()
