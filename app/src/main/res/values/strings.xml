@@ -21,7 +21,9 @@
     <string name="continue_to_quiz">המשך לחידון</string>
     <string name="try_again">🔄 נסה שוב</string>
     <string name="times_up">נגמר הזמן</string>
+    <string name="close">סגור</string>
     <string name="retry">נסה שוב</string>
+    <string name="scroll_down">לתחתית הדף</string>
     <string name="logout">🚪 התנתקות</string>
 
     <!-- 🏆 Quiz End Screen -->
