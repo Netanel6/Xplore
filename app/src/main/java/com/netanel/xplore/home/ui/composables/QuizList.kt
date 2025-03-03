@@ -1,6 +1,9 @@
 package com.netanel.xplore.home.ui.composables
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +48,7 @@ import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.utils.formatTime
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QuizList(
     quizzes: List<Quiz>,
@@ -108,7 +112,9 @@ fun QuizList(
                         state = listState,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        itemsIndexed(quizzes, key = { index, quiz -> "${quiz._id}_$index" }) { index, quiz ->
+                        itemsIndexed(
+                            quizzes,
+                            key = { index, quiz -> "${quiz._id}_$index" }) { index, quiz ->
                             QuizListItem(
                                 quiz = quiz,
                                 onClick = { onQuizSelected(quiz) },
@@ -147,57 +153,68 @@ fun QuizList(
 
 @Composable
 fun QuizListItem(quiz: Quiz, onClick: () -> Unit, backgroundColor: Color) {
-    Card(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 6.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+            .clickable(onClick = onClick)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(4.dp),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+            colors = CardDefaults.cardColors(containerColor = backgroundColor)
         ) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterStart
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+            ) {
+                // 🌟 Quiz Details Overlay
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = quiz.title ?: stringResource(R.string.select_quiz_title),
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         ),
                         maxLines = 1,
-                        softWrap = false,
                         overflow = TextOverflow.Ellipsis
                     )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = formatTime(quiz.quizTimer),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                        Text(
+                            text = stringResource(R.string.questions, quiz.questions.size),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                        Text(
+                            text = stringResource(R.string.final_score, quiz.totalScore),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                    }
                 }
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = formatTime(quiz.quizTimer),
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.questions, quiz.questions.size),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.final_score, quiz.totalScore),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            )
         }
     }
 }
