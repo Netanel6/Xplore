@@ -1,6 +1,5 @@
 package com.netanel.xplore.quiz.ui.composables
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +24,12 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.netanel.xplore.ui.theme.OnPrimary
 
-
 @Composable
 fun PointsAnimationScreen(
     points: Int,
     isCorrect: Boolean,
     correctAnswer: String,
+    explanation: String,
     onAnimationEnd: () -> Unit
 ) {
     val animationFile = if (isCorrect) "correct.json" else "wrong.json"
@@ -62,10 +61,9 @@ fun PointsAnimationScreen(
                 modifier = Modifier.size(200.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            val answerText = if(isCorrect) "+$points נקודות" else " התשובה היא:\n $correctAnswer"
+            val answerText = if (isCorrect) "+$points נקודות" else " התשובה היא:\n $correctAnswer"
             // Show feedback text based on correctness
             Text(
-
                 text = answerText,
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
@@ -73,6 +71,15 @@ fun PointsAnimationScreen(
                 ),
                 textAlign = TextAlign.Center
             )
+
+            // Show explanation only if the answer is correct
+            if (isCorrect) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = explanation,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
