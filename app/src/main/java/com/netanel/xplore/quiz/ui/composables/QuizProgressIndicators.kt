@@ -3,16 +3,12 @@ package com.netanel.xplore.quiz.ui.composables
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,8 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,10 +24,10 @@ import com.netanel.xplore.ui.theme.OnSecondary
 
 @Composable
 fun QuizProgressIndicators(
-    currentTimeLeft: Int,
-    totalTime: Int,
-    answerLockTimeLeft: Int,
-    initialLockTime: Int
+    currentTimeLeft: Long,
+    totalTime: Long,
+    answerLockTimeLeft: Long,
+    initialLockTime: Long
 ) {
     Column(
         modifier = Modifier
@@ -87,32 +81,5 @@ fun QuizProgressIndicators(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun GradientProgressBar(progress: Float) {
-    val gradientBrush = Brush.horizontalGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-            MaterialTheme.colorScheme.primary
-        ),
-        startX = 0f,
-        endX = 400f
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(14.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(progress)
-                .fillMaxHeight()
-                .background(gradientBrush)
-        )
     }
 }

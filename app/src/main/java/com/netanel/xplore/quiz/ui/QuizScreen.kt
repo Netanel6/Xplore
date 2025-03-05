@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +28,7 @@ import com.netanel.xplore.quiz.ui.composables.QuizFinishedAnimation
 import com.netanel.xplore.quiz.ui.composables.QuizProgressIndicators
 import com.netanel.xplore.quiz.ui.composables.QuizQuestion
 import com.netanel.xplore.quiz.utils.QuizTimerManager
+
 @Composable
 fun QuizScreen(
     quiz: Quiz,
@@ -44,7 +45,7 @@ fun QuizScreen(
     var quizCompleted by remember { mutableStateOf(false) }
     var showQuizFinishedAnimation by remember { mutableStateOf(false) }
 
-    var totalQuizTime by remember { mutableIntStateOf(0) }
+    var totalQuizTime by remember { mutableLongStateOf(0) }
 
     LaunchedEffect(quizState) {
         if (quizState is QuizState.Loaded) {
@@ -131,6 +132,7 @@ fun QuizScreen(
 
                     showPointsAnimation -> {
                         PointsAnimationScreen(
+                            explanation = currentQuestion?.explanation?:"",
                             points = currentQuestion?.points ?: 0,
                             isCorrect = currentQuestion?.isCorrect ?: false,
                             correctAnswer = currentQuestion?.answers?.get(currentQuestion.correctAnswerIndex ?: 0).toString(),
@@ -193,7 +195,7 @@ data class QuizUIState(
     val currentQuestion: Question?,
     val currentQuestionNumber: Int,
     val totalQuestions: Int,
-    val timeLeft: Int,
+    val timeLeft: Long,
     val quizCompleted: Boolean,
     val showPointsAnimation: Boolean,
     val showQuizFinishedAnimation: Boolean,
@@ -201,7 +203,7 @@ data class QuizUIState(
     val isNextEnabled: Boolean,
     val isAnswered: Boolean,
     val questionLocked: Boolean,
-    val answerLockTimeLeft: Int
+    val answerLockTimeLeft: Long
 )
 
 @Composable

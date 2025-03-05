@@ -10,18 +10,18 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class QuizTimerManager(
-    private var totalQuizTime: Int,  // ✅ Changed to var to allow updates
-    private val answerLockDuration: Int = 10
+    private var totalQuizTime: Long,
+    private val answerLockDuration: Long = 10
 ) {
     private var quizTimerJob: Job? = null
     private var answerLockJob: Job? = null
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val _totalTimeLeft = MutableStateFlow(totalQuizTime)
-    val totalTimeLeft: StateFlow<Int> = _totalTimeLeft
+    val totalTimeLeft: StateFlow<Long> = _totalTimeLeft
 
     private val _answerLockTimeLeft = MutableStateFlow(answerLockDuration)
-    val answerLockTimeLeft: StateFlow<Int> = _answerLockTimeLeft
+    val answerLockTimeLeft: StateFlow<Long> = _answerLockTimeLeft
 
     private val answerLockCompletion = mutableMapOf<Int, Boolean>()
 
@@ -31,7 +31,7 @@ class QuizTimerManager(
     var isAnswerLocked = true
         private set
 
-    fun updateTotalTime(newTotalTime: Int) {  // ✅ Add this function
+    fun updateTotalTime(newTotalTime: Long) {
         totalQuizTime = newTotalTime
         _totalTimeLeft.value = newTotalTime
     }

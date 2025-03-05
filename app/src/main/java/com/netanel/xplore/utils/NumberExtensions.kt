@@ -6,15 +6,15 @@ package com.netanel.xplore.utils
  * NetanelCA2@gmail.com
  */
 
-fun formatTime(seconds: Int): String {
-    val hours = seconds / 3600
-    val minutes = (seconds % 3600) / 60
-    val remainingSeconds = seconds % 60
+fun formatTime(milliseconds: Long): String {
+    val totalSeconds = milliseconds / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
 
-    return buildString {
-        if (hours > 0) append("$hours שעות ")
-        if (minutes > 0) append("$minutes דקות ")
-        if (remainingSeconds > 0 || isEmpty()) append("$remainingSeconds שניות")
+    return when {
+        hours > 0 -> "$hours שעות ${if (minutes > 0) "$minutes דקות" else ""} ${if (seconds > 0) "$seconds שניות" else ""}"
+        minutes > 0 -> "$minutes דקות ${if (seconds > 0) "$seconds שניות" else ""}"
+        else -> "$seconds שניות"
     }.trim()
 }
-

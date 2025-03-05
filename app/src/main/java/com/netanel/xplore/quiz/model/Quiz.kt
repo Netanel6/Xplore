@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 data class Quiz(
     var _id: String = "",
     var questions: List<Question>,
-    val quizTimer: Int,
-    val answerLockTimer: Int,
+    val quizTimer: Long,
+    val answerLockTimer: Long,
     val title: String? = null,
     val creatorId: String? = null,
     val isActive: Boolean = true,
