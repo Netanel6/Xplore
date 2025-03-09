@@ -44,6 +44,7 @@ okhttp = "4.11.0"
 room = "2.6.1"
 # Confetti
 konfetti = "2.0.2"
+compose-material-icons-extended = "1.7.8"
 
 
 [libraries]
@@ -64,6 +65,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-material-icons-extended" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
