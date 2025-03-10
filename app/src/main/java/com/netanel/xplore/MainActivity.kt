@@ -1,149 +1,84 @@
 package com.netanel.xplore
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-
-import com.netanel.xplore.temp.model.Question
-import com.netanel.xplore.temp.repository.QuizRepository
-import com.netanel.xplore.temp.ui.QuizViewModel
+import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
+import com.netanel.xplore.navigation.NavigationStack
+import com.netanel.xplore.ui.theme.OnPrimary
 import com.netanel.xplore.ui.theme.XploreTheme
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val configuration = Configuration(resources.configuration)
+        configuration.setLayoutDirection(Locale(getString(R.string.he_lang)))
+        resources.updateConfiguration(configuration, resources.displayMetrics)
+
         enableEdgeToEdge()
         setContent {
             XploreTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {
-                    QuizScreen()
-                }
+                MainScreen()
             }
         }
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun QuizScreen(viewModel: QuizViewModel = hiltViewModel()) {
-    val questions by viewModel.questions.collectAsState()
-    var currentQuestionIndex by remember { mutableIntStateOf(0) }
-    var showAnimation by remember { mutableStateOf(false) }
-
-    if (showAnimation) {
-        LottieAnimationScreen(onAnimationEnd = {
-            showAnimation = false
-            currentQuestionIndex += 1
-        })
-    } else {
-        if (currentQuestionIndex < questions.size) {
-            QuizQuestion(
-                question = questions[currentQuestionIndex],
-                onAnswerSelected = { isCorrect ->
-                    if (isCorrect) {
-                        showAnimation = true
-                    }
-                }
-            )
-        } else {
-            // Display end of quiz or summary screen
-            Text(
-                text = "You've completed the quiz!",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp)
-            )
+fun MainScreen(userViewModel: UserViewModel = hiltViewModel()) {
+    Scaffold(
+        topBar = { MainTopAppBar() },
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            NavigationStack(userViewModel = userViewModel)
         }
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuizQuestion(question: Question, onAnswerSelected: (Boolean) -> Unit) {
-    // Randomize the answers while keeping track of the correct one
-    val shuffledAnswers = remember {
-        val answersWithIndex = question.answers.mapIndexed { index, answer ->
-            index to answer
-        }.shuffled()
-        answersWithIndex
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(text = question.text, style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        shuffledAnswers.forEachIndexed { _, (originalIndex, answer) ->
-            ClickableText(
-                text = AnnotatedString(answer),
-                modifier = Modifier.padding(8.dp),
-                onClick = {
-                    // Check if the selected answer is correct
-                    val isCorrect = originalIndex == question.correctAnswerIndex
-                    onAnswerSelected(isCorrect)
-                }
+fun MainTopAppBar() {
+    TopAppBar(
+        title = { Text(stringResource(R.string.app_name)) },
+        navigationIcon = {
+            Icon(
+                painter = painterResource(R.drawable.question_mark),
+                tint = Color.White,
+                contentDescription = "Menu Icon"
             )
-        }
-    }
-}
-
-@Composable
-fun LottieAnimationScreen(onAnimationEnd: () -> Unit) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("lottie_animation.json"))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = 1,
-        speed = 1f
-    )
-
-    LaunchedEffect(progress) {
-        if (progress == 1f) {
-            onAnimationEnd()
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        LottieAnimation(
-            composition = composition,
-            progress = progress,
-            modifier = Modifier.fillMaxSize()
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = OnPrimary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary
         )
-    }
+    )
 }
+

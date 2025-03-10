@@ -1,6 +1,7 @@
-package com.netanel.xplore.temp.di
+package com.netanel.xplore.di
+
 import android.content.Context
-import com.netanel.xplore.temp.repository.QuizRepository
+import com.netanel.xplore.utils.SharedPreferencesManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,13 +11,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+object AppModule {
 
-    @Provides
     @Singleton
-    fun provideQuizRepository(
-        @ApplicationContext context: Context
-    ): QuizRepository {
-        return QuizRepository(context)
+    @Provides
+    fun provideSharedPreferencesManager(@ApplicationContext context: Context): SharedPreferencesManager {
+        return SharedPreferencesManager(context)
     }
 }

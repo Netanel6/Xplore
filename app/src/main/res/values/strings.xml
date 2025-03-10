@@ -1,3 +1,45 @@
 <resources>
+    <!-- 🌍 App Info -->
     <string name="app_name">Xplore</string>
+    <string name="he_lang">he</string>
+
+    <!-- 📲 Authentication & Login -->
+    <string name="to_login_write_phone_number">הזן את מספר הטלפון שלך כדי להמשיך</string>
+    <string name="what_is_your_number">מהו מספר הטלפון שלך?</string>
+    <string name="phone_num_incorrect">🫢 נראה שהמספר שהוזן אינו תקין</string>
+    <string name="next_step">הבא</string>
+    <string name="loading">טוען...</string>
+
+    <!-- 👤 User Messages -->
+    <string name="welcome_back">ברוך הבא, %1$s!</string>
+    <string name="continue_to_dashboard">לחץ כדי להתחיל</string>
+    <string name="user_not_found">לא נמצא חשבון תואם</string>
+
+    <!-- 🎮 Quiz Section -->
+    <string name="select_quiz">🎲 בחר חידון והתחל לשחק</string>
+    <string name="select_quiz_title">החידונים שלך</string>
+    <string name="continue_to_quiz">המשך לחידון</string>
+    <string name="try_again">🔄 נסה שוב</string>
+    <string name="times_up">נגמר הזמן</string>
+    <string name="close">סגור</string>
+    <string name="retry">נסה שוב</string>
+    <string name="scroll_down">לתחתית הדף</string>
+    <string name="logout">🚪 התנתקות</string>
+
+    <!-- 🏆 Quiz End Screen -->
+    <string name="quiz_completed"> כל הכבוד! סיימת את החידון🎉</string>
+    <string name="final_score">הניקוד שלך: %1$d נקודות</string>
+    <string name="go_home">🏠 חזור למסך הראשי</string>
+
+    <!-- 📖 Quiz Question Strings -->
+    <string name="question_number">שאלה %1$d מתוך %2$d</string>
+    <string name="questions">שאלות: %1$d</string>
+    <string name="next_question">לשאלה הבאה</string>
+    <string name="previous_question">שאלה קודמת</string>
+    <string name="submit">לשאלה הבאה</string>
+
+    <!-- ⏳ Timer & Lock -->
+    <string name="quiz_timer_text">⏳ זמן חידון נותר: %1$d שניות</string>
+    <string name="quiz_time_text">⏳ זמן חידון: %1$d %1$s</string>
+    <string name="answer_unlock_text">🔒 תשובות יפתחו בעוד %1$d שניות</string>
 </resources>
