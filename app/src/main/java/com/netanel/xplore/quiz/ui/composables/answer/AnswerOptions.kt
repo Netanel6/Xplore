@@ -1,6 +1,5 @@
-package com.netanel.xplore.quiz.ui.composables
+package com.netanel.xplore.quiz.ui.composables.answer
 
-import AnswerButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

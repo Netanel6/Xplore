@@ -27,6 +27,11 @@
     <string name="logout">🚪 התנתקות</string>
 
     <!-- 🏆 Quiz End Screen -->
+    <string name="points_added">%1$s נקודות נוספו 🎉</string>
+    <string name="correct_answer_is">התשובה הנכונה היא: %1$s </string>
+    <string name="explanation">הסבר:</string>
+
+    <!-- 🏆 Quiz End Screen -->
     <string name="quiz_completed"> כל הכבוד! סיימת את החידון🎉</string>
     <string name="final_score">הניקוד שלך: %1$d נקודות</string>
     <string name="go_home">🏠 חזור למסך הראשי</string>

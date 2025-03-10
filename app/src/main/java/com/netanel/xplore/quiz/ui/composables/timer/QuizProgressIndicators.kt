@@ -1,4 +1,4 @@
-package com.netanel.xplore.quiz.ui.composables
+package com.netanel.xplore.quiz.ui.composables.timer
 
 
 import androidx.compose.animation.core.animateFloatAsState
