@@ -1,4 +1,4 @@
-package com.netanel.xplore.quiz.ui.composables
+package com.netanel.xplore.quiz.ui.composables.question
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

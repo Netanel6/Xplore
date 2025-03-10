@@ -1,4 +1,4 @@
-package com.netanel.xplore.quiz.ui.composables
+package com.netanel.xplore.quiz.ui.composables.finish
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn

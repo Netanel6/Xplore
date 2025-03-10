@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
-import com.netanel.xplore.quiz.ui.composables.PointsAnimationScreen
-import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
-import com.netanel.xplore.quiz.ui.composables.QuizFinishedAnimation
-import com.netanel.xplore.quiz.ui.composables.QuizProgressIndicators
-import com.netanel.xplore.quiz.ui.composables.QuizQuestion
+import com.netanel.xplore.quiz.ui.composables.finish.PointsAnimationScreen
+import com.netanel.xplore.quiz.ui.composables.finish.QuizEndScreen
+import com.netanel.xplore.quiz.ui.composables.finish.QuizFinishedAnimation
+import com.netanel.xplore.quiz.ui.composables.question.QuizQuestion
+import com.netanel.xplore.quiz.ui.composables.timer.QuizProgressIndicators
 import com.netanel.xplore.quiz.utils.QuizTimerManager
 
 @Composable
