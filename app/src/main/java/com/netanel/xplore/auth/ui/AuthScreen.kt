@@ -36,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -60,7 +59,6 @@ fun AuthScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     var phoneNumber by remember { mutableStateOf("") }
     val authState by authViewModel.authState
     var isLoading by remember { mutableStateOf(false) }
