@@ -19,6 +19,7 @@ val BackgroundDark = Color(0xFF2D2D2D) //DM BG
 
 // 🎨 Text Colors
 val OnPrimary = Color(0xff0b42a3) //PrimaryDark
+val OnPrimarySecond = Color(0xff3b42a3) //PrimaryDark
 val OnSecondary = Color(0xFF5A5A5A) //SecondaryGray
 
 // 🎨 Gradient Colors

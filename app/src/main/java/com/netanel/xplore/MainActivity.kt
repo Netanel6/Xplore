@@ -9,22 +9,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.navigation.NavigationStack
-import com.netanel.xplore.ui.theme.OnPrimary
+import com.netanel.xplore.ui.MainTopAppBar
 import com.netanel.xplore.ui.theme.XploreTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -62,23 +53,5 @@ fun MainScreen(userViewModel: UserViewModel = hiltViewModel()) {
             NavigationStack(userViewModel = userViewModel)
         }
     }
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainTopAppBar() {
-    TopAppBar(
-        title = { Text(stringResource(R.string.app_name)) },
-        navigationIcon = {
-            Icon(
-                painter = painterResource(R.drawable.question_mark),
-                tint = Color.White,
-                contentDescription = "Menu Icon"
-            )
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = OnPrimary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    )
 }
 
