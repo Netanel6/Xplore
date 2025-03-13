@@ -47,6 +47,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.netanel.xplore.BuildConfig
 import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthViewModel.AuthState
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
@@ -97,6 +98,11 @@ fun AuthScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                BuildConfig.BUILD_TYPE.plus(" ${BuildConfig.VERSION_NAME}"),
+                fontSize = 18.sp
+            )
+
             // Lottie Animation
             LottieAnimation(
                 composition = lottieComposition,
