@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.netanel.xplore.R
+import com.netanel.xplore.quiz.ui.QuizResult
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.OnPrimary
 import kotlinx.coroutines.delay
@@ -47,7 +48,7 @@ import java.util.concurrent.TimeUnit
 
 @Composable
 fun QuizEndScreen(
-    totalScore: Int,
+    quizResult: QuizResult,
     onTryAgain: () -> Unit,
     onGoHome: () -> Unit
 ) {
@@ -122,7 +123,7 @@ fun QuizEndScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Text(
-                            text = stringResource(R.string.final_score, totalScore),
+                            text = stringResource(R.string.final_score, quizResult.totalScore),
                             fontSize = 24.sp,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
                             color = OnPrimary,

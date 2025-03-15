@@ -2,6 +2,7 @@ package com.netanel.xplore.quiz.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.repository.QuizRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,18 +23,13 @@ class QuizViewModel @Inject constructor(
     private val _currentQuestionIndex = MutableStateFlow(0)
     val currentQuestionIndex: StateFlow<Int> get() = _currentQuestionIndex
 
-    private val _showAnimation = MutableStateFlow(false)
-    val showAnimation: StateFlow<Boolean> get() = _showAnimation
-
-    private val _animationData = MutableStateFlow(AnimationData(0, false, ""))
-    val animationData: StateFlow<AnimationData> get() = _animationData
+    private val _quizResult = MutableStateFlow<QuizResult?>(null)
+    val quizResult: StateFlow<QuizResult?> get() = _quizResult
 
     fun loadQuiz(quiz: Quiz) {
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
             try {
-                /*val loadedQuiz = repository.getQuiz(quizId).copy(totalScore = 0)
-                currentQuiz = loadedQuiz*/
                 currentQuiz = quiz
                 _quizState.value = QuizState.Loaded(currentQuiz!!)
             } catch (e: Exception) {
@@ -70,27 +66,24 @@ class QuizViewModel @Inject constructor(
                     points = pointsGained,
                     isCorrect = isCorrect
                 )
-                currentQuiz = quiz.copy(
-                    questions = questions,
-                    totalScore = quiz.totalScore + pointsGained
-                )
+                currentQuiz = quiz.copy(questions = questions)
 
-                // 🎉 Show animation before proceeding
-                _animationData.value = AnimationData(
-                    pointsGained,
-                    isCorrect,
-                    question.answers?.get(question.correctAnswerIndex ?: 0) ?: ""
+                // Update quiz result
+                val questionResult = QuestionResult(
+                    question = question,
+                    isCorrect = isCorrect,
+                    pointsAwarded = pointsGained
                 )
-                _showAnimation.value = true
+                val updatedResults = _quizResult.value?.questionResults.orEmpty() + questionResult
+                val updatedTotalScore = updatedResults.sumOf { it.pointsAwarded }
+                _quizResult.value = QuizResult(
+                    totalScore = updatedTotalScore,
+                    questionResults = updatedResults
+                )
 
                 _quizState.value = QuizState.Loaded(currentQuiz!!)
             }
         }
-    }
-
-    fun hideAnimation() {
-        _showAnimation.value = false
-        nextQuestion()
     }
 
     fun nextQuestion() {
@@ -114,7 +107,6 @@ class QuizViewModel @Inject constructor(
             try {
                 val quizId = currentQuiz?._id ?: return@launch
                 val freshQuiz = repository.getQuiz(quizId).copy(
-                    totalScore = 0,
                     questions = repository.getQuiz(quizId).questions.map { it.copy(
                         userSelectedAnswer = null,
                         isAnswered = false,
@@ -124,6 +116,7 @@ class QuizViewModel @Inject constructor(
 
                 currentQuiz = freshQuiz
                 _currentQuestionIndex.value = 0
+                _quizResult.value = null
                 _quizState.value = QuizState.Loaded(freshQuiz)
             } catch (e: Exception) {
                 _quizState.value = QuizState.Error("Failed to reset quiz: ${e.message}")
@@ -132,8 +125,21 @@ class QuizViewModel @Inject constructor(
     }
 }
 
+
 data class AnimationData(
     val points: Int,
     val isCorrect: Boolean,
     val correctAnswer: String
+)
+
+
+data class QuizResult(
+    val totalScore: Int,
+    val questionResults: List<QuestionResult>
+)
+
+data class QuestionResult(
+    val question: Question,
+    val isCorrect: Boolean,
+    val pointsAwarded: Int
 )
