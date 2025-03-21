@@ -46,6 +46,7 @@ import com.netanel.xplore.R
 import com.netanel.xplore.home.ui.composables.QuizList
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.quiz.model.Quiz
+import com.netanel.xplore.ui.QuestionMarkBackground
 import com.netanel.xplore.ui.theme.SoftWhite
 import kotlinx.coroutines.delay
 
@@ -69,7 +70,6 @@ fun HomeScreen(
         isUiVisible = true
     }
 
-
     val bgLottieComposition by rememberLottieComposition(LottieCompositionSpec.Asset("home_bg.json"))
     val mainLottieComposition by rememberLottieComposition(LottieCompositionSpec.Asset("home_animation.json"))
 
@@ -85,6 +85,7 @@ fun HomeScreen(
             .fillMaxSize()
             .background(gradientBackground)
     ) {
+
         // Lottie Animation as Background (Optional - Use if you have a suitable animation)
         bgLottieComposition?.let {
             LottieAnimation(
@@ -94,7 +95,7 @@ fun HomeScreen(
                 contentScale = ContentScale.Crop
             )
         }
-
+        QuestionMarkBackground()
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,7 +103,8 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Welcome Text, make it fade in when username is available
+
+        // Welcome Text, make it fade in when username is available
             AnimatedVisibility(
                 visible = isUiVisible && username.isNotBlank(),
                 enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
