@@ -1,5 +1,14 @@
-package com.netanel.xplore.quiz.ui.composables.finish
-
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -36,6 +46,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,51 +56,81 @@ import com.netanel.xplore.R
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.ui.QuizState
 import com.netanel.xplore.quiz.ui.QuizViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ScoreBoardList(
+fun ScoreBoardScreen(
     quizId: String,
     viewModel: QuizViewModel = hiltViewModel(),
     onClose: () -> Unit
 ) {
     val quizState by viewModel.quizState.collectAsState()
     val listState = rememberLazyListState()
-    var showArrow by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var showArrow by remember { mutableStateOf(false) }
+    var lastSortedScores by remember { mutableStateOf(emptyList<List<Quiz.ScoreBoard.Score>>()) }
+    var isRefreshing by remember { mutableStateOf(false) }
 
-    // 🧠 Load quiz if not already loaded
+    // Load quiz initially
     LaunchedEffect(quizId) {
         viewModel.fetchQuizById(quizId)
     }
 
     val scoreBoard = (quizState as? QuizState.Loaded)?.quiz?.scoreBoard
+    val groupedScores = scoreBoard?.scores
+        ?.groupBy { it.score } // Group players by their scores
+        ?.entries
+        ?.sortedByDescending { it.key } // Sort by highest score first
+        ?.map { it.value } // Convert to a list of lists
+        ?: emptyList()
 
-    LaunchedEffect(scoreBoard?.scores) {
+    // Detect ranking order changes
+    val scoresChanged = lastSortedScores != groupedScores
+
+    // Store previous order of scores
+    LaunchedEffect(groupedScores) {
+        lastSortedScores = groupedScores
+    }
+
+    // Track scroll position
+    LaunchedEffect(groupedScores) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
             .collect { visibleItems ->
                 showArrow = visibleItems.isNotEmpty() &&
-                        visibleItems.last().index < (scoreBoard?.scores?.lastIndex ?: 0)
+                        visibleItems.last().index < (groupedScores.lastIndex)
             }
     }
+
+    // 🔄 Continuous rotation animation for refresh button
+    val rotationAnimation = rememberInfiniteTransition()
+    val rotationAngle by rotationAnimation.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 800, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
 
     Box(modifier = Modifier.fillMaxSize()) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column {
-                // 🏷 Header
+                // 🏷 Header with Close & Refresh Buttons
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = stringResource(R.string.scoreboard),
@@ -98,12 +139,35 @@ fun ScoreBoardList(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     )
-                    IconButton(onClick = onClose) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.close),
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        IconButton(
+                            onClick = {
+                                isRefreshing = true
+                                viewModel.fetchQuizById(quizId)
+                                coroutineScope.launch {
+                                    delay(1000) // Simulating refresh time
+                                    isRefreshing = false
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.refresh),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.graphicsLayer(
+                                    rotationZ = if (isRefreshing) rotationAngle else 0f
+                                )
+                            )
+                        }
+
+                        IconButton(onClick = onClose) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.close),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
 
@@ -112,23 +176,45 @@ fun ScoreBoardList(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                if (scoreBoard != null) {
+                if (groupedScores.isNotEmpty()) {
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        itemsIndexed(scoreBoard.scores) { index, score ->
-                            ScoreBoardItem(
-                                score = score,
-                                index = index + 1,
-                                backgroundColor = if (index % 2 == 0)
-                                    MaterialTheme.colorScheme.surface
-                                else
-                                    MaterialTheme.colorScheme.surfaceVariant
-                            )
+                        itemsIndexed(
+                            groupedScores,
+                            key = { _, group -> group.first().id }) { index, group ->
+                            AnimatedContent(
+                                targetState = index,
+                                transitionSpec = {
+                                    slideInVertically(animationSpec = tween(400)) togetherWith fadeOut(
+                                        animationSpec = tween(200)
+                                    )
+                                }
+                            ) { _ ->
+                                ScoreBoardGroupItem(
+                                    scores = group,
+                                    index = index + 1,
+                                    backgroundColor = if (index % 2 == 0)
+                                        MaterialTheme.colorScheme.surface
+                                    else
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            }
                         }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_scores_yet),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
 
@@ -140,9 +226,7 @@ fun ScoreBoardList(
                             .padding(bottom = 8.dp)
                             .clickable {
                                 coroutineScope.launch {
-                                    listState.animateScrollToItem(
-                                        scoreBoard?.scores?.lastIndex ?: 0
-                                    )
+                                    listState.animateScrollToItem(groupedScores.lastIndex)
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -161,12 +245,12 @@ fun ScoreBoardList(
 }
 
 @Composable
-fun ScoreBoardItem(score: Quiz.ScoreBoard.Score, index: Int, backgroundColor: Color) {
+fun ScoreBoardGroupItem(scores: List<Quiz.ScoreBoard.Score>, index: Int, backgroundColor: Color) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
-            .padding(4.dp),
+            .padding(horizontal = 16.dp, vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
@@ -180,10 +264,11 @@ fun ScoreBoardItem(score: Quiz.ScoreBoard.Score, index: Int, backgroundColor: Co
         ) {
             Text(
                 text = "$index.",
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = score.userName,
+                text = scores.joinToString(", ") { it.userName },
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Medium
                 ),
@@ -192,10 +277,10 @@ fun ScoreBoardItem(score: Quiz.ScoreBoard.Score, index: Int, backgroundColor: Co
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "${score.score} נק׳ ",
+                text = "${scores.first().score} נק׳ ",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.secondary
                 )
             )
         }
