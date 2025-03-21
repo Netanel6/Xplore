@@ -36,6 +36,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.netanel.xplore.R
+import com.netanel.xplore.quiz.model.Quiz
+import com.netanel.xplore.quiz.ui.QuizResult
+import com.netanel.xplore.quiz.ui.QuizViewModel
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.OnPrimary
 import kotlinx.coroutines.delay
@@ -47,15 +50,18 @@ import java.util.concurrent.TimeUnit
 
 @Composable
 fun QuizEndScreen(
-    totalScore: Int,
+    quiz: Quiz,
+    quizResult: QuizResult,
+    quizViewModel: QuizViewModel,
     onTryAgain: () -> Unit,
     onGoHome: () -> Unit
 ) {
     var isConfettiVisible by remember { mutableStateOf(true) }
     var isUiVisible by remember { mutableStateOf(false) }
+    var isScoreBoardVisible by remember { mutableStateOf(false) }
 
-    // 🔥 Trigger confetti effect for 3s before revealing UI
     LaunchedEffect(Unit) {
+        quizViewModel.updateQuiz()
         delay(3000)
         isConfettiVisible = false
         isUiVisible = true
@@ -65,7 +71,7 @@ fun QuizEndScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // 🎊 Confetti Effect
+        // 🎊 Confetti
         AnimatedComposable(
             isVisible = isConfettiVisible,
             content = {
@@ -86,14 +92,12 @@ fun QuizEndScreen(
             }
         )
 
-        // 🎉 Main UI appears AFTER confetti
         AnimatedComposable(
             isVisible = isUiVisible,
             enter = fadeIn(animationSpec = tween(1000)) + scaleIn(animationSpec = tween(700)),
             content = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                    // 🎉 Success Icon
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = stringResource(R.string.quiz_completed),
@@ -103,7 +107,6 @@ fun QuizEndScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // 🏆 Completion Message
                     Text(
                         text = stringResource(R.string.quiz_completed),
                         fontSize = 30.sp,
@@ -113,7 +116,6 @@ fun QuizEndScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 🏅 Score Display with Card
                     Card(
                         modifier = Modifier
                             .padding(8.dp)
@@ -122,7 +124,7 @@ fun QuizEndScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Text(
-                            text = stringResource(R.string.final_score, totalScore),
+                            text = stringResource(R.string.final_score, quizResult.totalScore),
                             fontSize = 24.sp,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
                             color = OnPrimary,
@@ -132,7 +134,6 @@ fun QuizEndScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // 🔘 Action Buttons
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -153,6 +154,25 @@ fun QuizEndScreen(
                             modifier = Modifier.padding(8.dp)
                         ) {
                             Text(text = stringResource(R.string.go_home), fontSize = 18.sp)
+                        }
+                    }
+
+                    // 🧮 Scoreboard Button (spread across full width)
+                    Button(
+                        onClick = { isScoreBoardVisible = !isScoreBoardVisible },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                    ) {
+                        Text(text = stringResource(R.string.scoreboard), fontSize = 18.sp)
+                    }
+
+                    // 🧾 ScoreBoard List (Conditional)
+                    if (isScoreBoardVisible) {
+                        ScoreBoardList(quiz._id, quizViewModel) {
+                            isScoreBoardVisible = false
                         }
                     }
                 }

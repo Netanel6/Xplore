@@ -147,7 +147,9 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
 
             ) {
+
                 QuizList(
+                    userId = userId,
                     quizzes = quizList.orEmpty(),
                     onQuizSelected = { quiz ->
                         showQuizList = false

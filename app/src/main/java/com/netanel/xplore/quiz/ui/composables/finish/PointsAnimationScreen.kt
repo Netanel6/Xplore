@@ -31,18 +31,23 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.netanel.xplore.R
+import com.netanel.xplore.quiz.ui.QuizResult
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.OnPrimary
 import com.netanel.xplore.ui.theme.OnSecondary
 
 @Composable
 fun PointsAnimationScreen(
-    points: Int,
-    isCorrect: Boolean,
-    correctAnswer: String,
-    explanation: String,
+    currentQuestionIndex: Int,
+    quizResult: QuizResult,
     onAnimationEnd: () -> Unit
 ) {
+    val isCorrect = quizResult.questionResults[currentQuestionIndex].isCorrect
+    val points = quizResult.questionResults[currentQuestionIndex].pointsAwarded
+    val correctAnswer =
+        quizResult.questionResults[currentQuestionIndex].question.answers?.get(currentQuestionIndex) as String
+    val explanation =
+        quizResult.questionResults[currentQuestionIndex].question.explanation as String
     val animationFile = if (isCorrect) "correct.json" else "wrong.json"
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(animationFile))
     val progress by animateLottieCompositionAsState(
