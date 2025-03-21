@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
+import com.netanel.xplore.quiz.model.UpdateScoreRequest
 import com.netanel.xplore.quiz.repository.QuizRepository
+import com.netanel.xplore.utils.SharedPrefKeys.USER_ID
+import com.netanel.xplore.utils.SharedPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val repository: QuizRepository
+    private val quizRepository: QuizRepository,
+    private val sharedPreferencesManager: SharedPreferencesManager
 ) : ViewModel() {
 
     private val _quizState = MutableStateFlow<QuizState>(QuizState.Loading)
@@ -106,8 +110,9 @@ class QuizViewModel @Inject constructor(
             _quizState.value = QuizState.Loading
             try {
                 val quizId = currentQuiz?._id ?: return@launch
-                val freshQuiz = repository.getQuiz(quizId).copy(
-                    questions = repository.getQuiz(quizId).questions.map { it.copy(
+                val freshQuiz = quizRepository.getQuiz(quizId).copy(
+                    questions = quizRepository.getQuiz(quizId).questions.map {
+                        it.copy(
                         userSelectedAnswer = null,
                         isAnswered = false,
                         points = 0
@@ -121,6 +126,14 @@ class QuizViewModel @Inject constructor(
             } catch (e: Exception) {
                 _quizState.value = QuizState.Error("Failed to reset quiz: ${e.message}")
             }
+        }
+    }
+
+    fun updateQuiz() {
+        val userId = sharedPreferencesManager.getString(USER_ID, "")
+        val updateScoreRequest = UpdateScoreRequest(userId, quizResult.value?.totalScore)
+        viewModelScope.launch {
+            currentQuiz?._id?.let { quizRepository.updateQuiz(it, updateScoreRequest) }
         }
     }
 }

@@ -165,6 +165,7 @@ fun QuizScreen(
                     QuizEndScreen(
                         quiz = quiz,
                         quizResult = quizResult,
+                        quizViewModel = viewModel,
                         onTryAgain = {
                             quizCompleted = false
                             showPointsAnimation = false

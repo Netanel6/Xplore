@@ -3,8 +3,11 @@ package com.netanel.xplore.quiz.data
 import com.netanel.xplore.auth.repository.model.User
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
+import com.netanel.xplore.quiz.model.UpdateScoreRequest
 import com.netanel.xplore.utils.ServerResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.Path
 
 interface QuizApi {
@@ -19,4 +22,10 @@ interface QuizApi {
 
     @GET("/quizzes/{userId}")
     suspend fun getUserQuizList(@Path("userId") userId: String): ServerResponse<List<User.Quiz>>
+
+    @PATCH("quizzes/quiz/{quizId}/scores")
+    suspend fun updateQuizScore(
+        @Path("quizId") quizId: String,
+        @Body scoreUpdate: UpdateScoreRequest
+    ): ServerResponse<Quiz>
 } 

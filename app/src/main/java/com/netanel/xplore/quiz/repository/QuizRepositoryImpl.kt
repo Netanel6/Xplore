@@ -3,6 +3,7 @@ package com.netanel.xplore.quiz.repository
 import com.netanel.xplore.quiz.data.QuizApi
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
+import com.netanel.xplore.quiz.model.UpdateScoreRequest
 
 
 /**
@@ -26,6 +27,15 @@ class QuizRepositoryImpl(private val api: QuizApi): QuizRepository {
             return response.data
         } else {
             throw Exception(response.message ?: "Unknown error")
+        }
+    }
+
+    override suspend fun updateQuiz(quizId: String, score: UpdateScoreRequest): Quiz? {
+        return try {
+            val response = api.updateQuizScore(quizId, score)
+            return response.data
+        } catch (e: Exception) {
+            null
         }
     }
 

@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.netanel.xplore.R
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.quiz.ui.QuizResult
+import com.netanel.xplore.quiz.ui.QuizViewModel
 import com.netanel.xplore.ui.AnimatedComposable
 import com.netanel.xplore.ui.theme.OnPrimary
 import kotlinx.coroutines.delay
@@ -51,6 +52,7 @@ import java.util.concurrent.TimeUnit
 fun QuizEndScreen(
     quiz: Quiz,
     quizResult: QuizResult,
+    quizViewModel: QuizViewModel,
     onTryAgain: () -> Unit,
     onGoHome: () -> Unit
 ) {
@@ -59,6 +61,7 @@ fun QuizEndScreen(
     var isScoreBoardVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        quizViewModel.updateQuiz()
         delay(3000)
         isConfettiVisible = false
         isUiVisible = true
@@ -168,7 +171,7 @@ fun QuizEndScreen(
 
                     // 🧾 ScoreBoard List (Conditional)
                     if (isScoreBoardVisible) {
-                        ScoreBoardList(scoreBoard = quiz.scoreBoard) {
+                        ScoreBoardList() {
                             isScoreBoardVisible = false
                         }
                     }
