@@ -171,7 +171,7 @@ fun QuizEndScreen(
 
                     // 🧾 ScoreBoard List (Conditional)
                     if (isScoreBoardVisible) {
-                        ScoreBoardList() {
+                        ScoreBoardList(scoreBoard = quiz.scoreBoard) {
                             isScoreBoardVisible = false
                         }
                     }
