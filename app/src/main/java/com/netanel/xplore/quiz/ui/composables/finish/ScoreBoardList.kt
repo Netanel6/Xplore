@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,24 +40,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.R
 import com.netanel.xplore.quiz.model.Quiz
+import com.netanel.xplore.quiz.ui.QuizState
+import com.netanel.xplore.quiz.ui.QuizViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun ScoreBoardList(
-    scoreBoard: Quiz.ScoreBoard,
+    quizId: String,
+    viewModel: QuizViewModel = hiltViewModel(),
     onClose: () -> Unit
 ) {
+    val quizState by viewModel.quizState.collectAsState()
     val listState = rememberLazyListState()
     var showArrow by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(scoreBoard.scores) {
+    // 🧠 Load quiz if not already loaded
+    LaunchedEffect(quizId) {
+        viewModel.fetchQuizById(quizId)
+    }
+
+    val scoreBoard = (quizState as? QuizState.Loaded)?.quiz?.scoreBoard
+
+    LaunchedEffect(scoreBoard?.scores) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
             .collect { visibleItems ->
                 showArrow = visibleItems.isNotEmpty() &&
-                        visibleItems.last().index < scoreBoard.scores.lastIndex
+                        visibleItems.last().index < (scoreBoard?.scores?.lastIndex ?: 0)
             }
     }
 
@@ -99,21 +112,23 @@ fun ScoreBoardList(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) {
-                    itemsIndexed(scoreBoard.scores) { index, score ->
-                        ScoreBoardItem(
-                            score = score,
-                            index = index + 1,
-                            backgroundColor = if (index % 2 == 0)
-                                MaterialTheme.colorScheme.surface
-                            else
-                                MaterialTheme.colorScheme.surfaceVariant
-                        )
+                if (scoreBoard != null) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        itemsIndexed(scoreBoard.scores) { index, score ->
+                            ScoreBoardItem(
+                                score = score,
+                                index = index + 1,
+                                backgroundColor = if (index % 2 == 0)
+                                    MaterialTheme.colorScheme.surface
+                                else
+                                    MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        }
                     }
                 }
 
@@ -125,7 +140,9 @@ fun ScoreBoardList(
                             .padding(bottom = 8.dp)
                             .clickable {
                                 coroutineScope.launch {
-                                    listState.animateScrollToItem(scoreBoard.scores.lastIndex)
+                                    listState.animateScrollToItem(
+                                        scoreBoard?.scores?.lastIndex ?: 0
+                                    )
                                 }
                             },
                         contentAlignment = Alignment.Center

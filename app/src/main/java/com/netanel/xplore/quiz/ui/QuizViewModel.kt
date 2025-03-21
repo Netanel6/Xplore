@@ -136,8 +136,18 @@ class QuizViewModel @Inject constructor(
             currentQuiz?._id?.let { quizRepository.updateQuiz(it, updateScoreRequest) }
         }
     }
+    fun fetchQuizById(quizId: String) {
+        viewModelScope.launch {
+            try {
+                _quizState.value = QuizState.Loading
+                val quiz = quizRepository.getQuiz(quizId)
+                _quizState.value = QuizState.Loaded(quiz)
+            } catch (e: Exception) {
+                _quizState.value = QuizState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
 }
-
 
 data class AnimationData(
     val points: Int,
