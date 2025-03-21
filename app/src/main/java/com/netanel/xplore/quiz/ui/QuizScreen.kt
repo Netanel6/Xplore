@@ -163,6 +163,7 @@ fun QuizScreen(
             quizCompleted -> {
                 viewModel.quizResult.value?.let { quizResult ->
                     QuizEndScreen(
+                        quiz = quiz,
                         quizResult = quizResult,
                         onTryAgain = {
                             quizCompleted = false

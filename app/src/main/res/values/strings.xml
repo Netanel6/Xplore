@@ -47,4 +47,5 @@
     <string name="quiz_timer_text">⏳ זמן חידון נותר: %1$d שניות</string>
     <string name="quiz_time_text">⏳ זמן חידון: %1$d %1$s</string>
     <string name="answer_unlock_text">🔒 תשובות יפתחו בעוד %1$d שניות</string>
+    <string name="scoreboard">לוח תוצאות</string>
 </resources>
