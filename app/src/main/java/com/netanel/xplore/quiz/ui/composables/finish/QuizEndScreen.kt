@@ -1,5 +1,6 @@
 package com.netanel.xplore.quiz.ui.composables.finish
 
+import ScoreBoardScreen
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
@@ -171,7 +172,7 @@ fun QuizEndScreen(
 
                     // 🧾 ScoreBoard List (Conditional)
                     if (isScoreBoardVisible) {
-                        ScoreBoardList(quiz._id, quizViewModel) {
+                        ScoreBoardScreen(quiz._id, quizViewModel) {
                             isScoreBoardVisible = false
                         }
                     }
