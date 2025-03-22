@@ -1,4 +1,4 @@
-package com.netanel.xplore.quiz.ui.composables
+package com.netanel.xplore.quiz.ui.composables.question
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.netanel.xplore.quiz.ui.QuizUIState
+import com.netanel.xplore.quiz.ui.composables.QuizNavigationBar
+import com.netanel.xplore.quiz.ui.composables.answer.AnswerOptions
 
 @Composable
 fun QuizQuestion(

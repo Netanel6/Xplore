@@ -3,12 +3,10 @@ package com.netanel.xplore.home.ui.composables
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +21,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +49,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QuizList(
+    userId: String,
     quizzes: List<Quiz>,
     onQuizSelected: (Quiz) -> Unit,
     onClose: () -> Unit
@@ -102,7 +101,10 @@ fun QuizList(
                     }
                 }
 
-                Divider(color = MaterialTheme.colorScheme.onSurfaceVariant, thickness = 1.dp)
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
                 // 📜 Quiz List
                 Box(
@@ -116,6 +118,7 @@ fun QuizList(
                             quizzes,
                             key = { index, quiz -> "${quiz._id}_$index" }) { index, quiz ->
                             QuizListItem(
+                                userId = userId,
                                 quiz = quiz,
                                 onClick = { onQuizSelected(quiz) },
                                 backgroundColor = if (index % 2 == 0) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surfaceVariant
@@ -152,7 +155,7 @@ fun QuizList(
 }
 
 @Composable
-fun QuizListItem(quiz: Quiz, onClick: () -> Unit, backgroundColor: Color) {
+fun QuizListItem(userId: String, quiz: Quiz, onClick: () -> Unit, backgroundColor: Color) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -207,7 +210,10 @@ fun QuizListItem(quiz: Quiz, onClick: () -> Unit, backgroundColor: Color) {
                             )
                         )
                         Text(
-                            text = stringResource(R.string.final_score, quiz.totalScore),
+                            text = stringResource(
+                                R.string.final_score,
+                                quiz.scoreBoard.scores.find { it.id == userId }?.score ?: 0
+                            ),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.secondary
                             )

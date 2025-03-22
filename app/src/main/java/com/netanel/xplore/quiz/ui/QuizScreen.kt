@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.quiz.model.Question
 import com.netanel.xplore.quiz.model.Quiz
-import com.netanel.xplore.quiz.ui.composables.PointsAnimationScreen
-import com.netanel.xplore.quiz.ui.composables.QuizEndScreen
-import com.netanel.xplore.quiz.ui.composables.QuizFinishedAnimation
-import com.netanel.xplore.quiz.ui.composables.QuizProgressIndicators
-import com.netanel.xplore.quiz.ui.composables.QuizQuestion
+import com.netanel.xplore.quiz.ui.composables.finish.PointsAnimationScreen
+import com.netanel.xplore.quiz.ui.composables.finish.QuizEndScreen
+import com.netanel.xplore.quiz.ui.composables.finish.QuizFinishedAnimation
+import com.netanel.xplore.quiz.ui.composables.question.QuizQuestion
+import com.netanel.xplore.quiz.ui.composables.timer.QuizProgressIndicators
 import com.netanel.xplore.quiz.utils.QuizTimerManager
 
 @Composable
@@ -144,38 +144,41 @@ fun QuizScreen(
             }
 
             showPointsAnimation -> {
-                PointsAnimationScreen(
-                    explanation = currentQuestion?.explanation ?: "",
-                    points = currentQuestion?.points ?: 0,
-                    isCorrect = currentQuestion?.isCorrect ?: false,
-                    correctAnswer = currentQuestion?.answers
-                        ?.get(currentQuestion.correctAnswerIndex ?: 0).toString(),
-                    onAnimationEnd = {
-                        showPointsAnimation = false
-                        if (currentQuestionIndex == uiState.totalQuestions - 1) {
-                            quizCompleted = true
-                        } else {
-                            viewModel.nextQuestion()
+                viewModel.quizResult.value?.let {
+                    PointsAnimationScreen(
+                        currentQuestionIndex = currentQuestionIndex,
+                        quizResult = it,
+                        onAnimationEnd = {
+                            showPointsAnimation = false
+                            if (currentQuestionIndex == uiState.totalQuestions - 1) {
+                                quizCompleted = true
+                            } else {
+                                viewModel.nextQuestion()
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
 
             quizCompleted -> {
-                QuizEndScreen(
-                    totalScore = (quizState as QuizState.Loaded).quiz.totalScore,
-                    onTryAgain = {
-                        quizCompleted = false
-                        showPointsAnimation = false
-                        timerManager.resetTimers()
-                        viewModel.resetQuiz()
-                        viewedQuestions.clear()
-                    },
-                    onGoHome = {
-                        timerManager.resetTimers()
-                        onGoHome()
-                    }
-                )
+                viewModel.quizResult.value?.let { quizResult ->
+                    QuizEndScreen(
+                        quiz = quiz,
+                        quizResult = quizResult,
+                        quizViewModel = viewModel,
+                        onTryAgain = {
+                            quizCompleted = false
+                            showPointsAnimation = false
+                            timerManager.resetTimers()
+                            viewModel.resetQuiz()
+                            viewedQuestions.clear()
+                        },
+                        onGoHome = {
+                            timerManager.resetTimers()
+                            onGoHome()
+                        }
+                    )
+                }
             }
 
             else -> {

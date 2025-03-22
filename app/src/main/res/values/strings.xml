@@ -27,6 +27,11 @@
     <string name="logout">🚪 התנתקות</string>
 
     <!-- 🏆 Quiz End Screen -->
+    <string name="points_added">%1$s נקודות נוספו 🎉</string>
+    <string name="correct_answer_is">התשובה הנכונה היא: %1$s </string>
+    <string name="explanation">הסבר:</string>
+
+    <!-- 🏆 Quiz End Screen -->
     <string name="quiz_completed"> כל הכבוד! סיימת את החידון🎉</string>
     <string name="final_score">הניקוד שלך: %1$d נקודות</string>
     <string name="go_home">🏠 חזור למסך הראשי</string>
@@ -42,4 +47,8 @@
     <string name="quiz_timer_text">⏳ זמן חידון נותר: %1$d שניות</string>
     <string name="quiz_time_text">⏳ זמן חידון: %1$d %1$s</string>
     <string name="answer_unlock_text">🔒 תשובות יפתחו בעוד %1$d שניות</string>
+    <string name="scoreboard">לוח תוצאות</string>
+    <string name="refresh">רענון</string>
+    <string name="no_scores_yet">אין תוצאות עדייו...</string>
+    <string name="points">נק׳</string>
 </resources>
