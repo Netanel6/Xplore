@@ -47,7 +47,6 @@ import com.netanel.xplore.home.ui.composables.QuizList
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.quiz.model.Quiz
 import com.netanel.xplore.ui.QuestionMarkBackground
-import com.netanel.xplore.ui.theme.SoftWhite
 import kotlinx.coroutines.delay
 
 @Composable
@@ -63,7 +62,6 @@ fun HomeScreen(
     var showQuizList by remember { mutableStateOf(false) }
     var isUiVisible by remember { mutableStateOf(false) }
 
-    // Fetch quizzes for user when screen loads
     LaunchedEffect(userId) {
         homeViewModel.fetchUserQuizzes(userId)
         delay(300)
@@ -85,8 +83,6 @@ fun HomeScreen(
             .fillMaxSize()
             .background(gradientBackground)
     ) {
-
-        // Lottie Animation as Background (Optional - Use if you have a suitable animation)
         bgLottieComposition?.let {
             LottieAnimation(
                 composition = it,
@@ -104,7 +100,6 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-        // Welcome Text, make it fade in when username is available
             AnimatedVisibility(
                 visible = isUiVisible && username.isNotBlank(),
                 enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
@@ -114,7 +109,7 @@ fun HomeScreen(
                     text = stringResource(R.string.welcome_back, username),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     modifier = Modifier.padding(top = 48.dp, bottom = 16.dp),
                     textAlign = TextAlign.Center
                 )
@@ -123,7 +118,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Main Animation
             mainLottieComposition?.let {
                 AnimatedVisibility(visible = !showQuizList, content = {
                     LottieAnimation(
@@ -136,7 +130,6 @@ fun HomeScreen(
                 })
             }
 
-            // Quiz List (Animated appearance, slide up/down)  Place this *above* buttons.
             val density2 = LocalDensity.current
             AnimatedVisibility(
                 visible = showQuizList,
@@ -164,7 +157,6 @@ fun HomeScreen(
             }
 
 
-            // Container for Buttons with Shared Animation - Slide Up/Down, plus overall Fade
             val density = LocalDensity.current
             AnimatedVisibility(
                 visible = !showQuizList,
@@ -189,8 +181,8 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = SoftWhite
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = MaterialTheme.colorScheme.onSecondary
                         )
                     ) {
                         Text(stringResource(R.string.select_quiz), fontSize = 18.sp)
@@ -203,8 +195,8 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = SoftWhite
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = MaterialTheme.colorScheme.onSecondary
                         )
                     ) {
                         Text(stringResource(R.string.logout), fontSize = 18.sp)

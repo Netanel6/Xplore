@@ -82,8 +82,8 @@ fun PointsAnimationScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f), // Occupy available space for vertical centering
-                contentAlignment = Alignment.Center // Center Lottie animation within Box
+                    .weight(1f),
+                contentAlignment = Alignment.Center
             ) {
                 // Lottie Animation (Takes up more space)
                 LottieAnimation(
@@ -107,13 +107,13 @@ fun PointsAnimationScreen(
                     color = if (isCorrect) OnPrimary else Error,
                     textAlign = TextAlign.Center
                 ),
-                modifier = Modifier.scale(scale.value) // Apply the scale animation
+                modifier = Modifier.scale(scale.value)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Explanation (Conditional and in a Card)
-            if (explanation.isNotBlank()) { // Show even if it's not correct
+            if (explanation.isNotBlank() && !isCorrect) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

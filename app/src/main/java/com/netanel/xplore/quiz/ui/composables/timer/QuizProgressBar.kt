@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.netanel.xplore.R
 import com.netanel.xplore.ui.theme.BackgroundLight
 import com.netanel.xplore.ui.theme.GradientEnd
 import com.netanel.xplore.ui.theme.GradientMid
@@ -81,7 +83,7 @@ fun QuizProgressBar(
                 tint = GradientMid
             )
             Text(
-                text = "זמן חידון: $formattedTime",
+                text = stringResource(R.string.quiz_time_text_2, formattedTime),
                 style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
             )
         }

@@ -44,11 +44,13 @@
     <string name="submit">לשאלה הבאה</string>
 
     <!-- ⏳ Timer & Lock -->
-    <string name="quiz_timer_text">⏳ זמן חידון נותר: %1$d שניות</string>
+    <string name="quiz_timer_text">⏳ זמן חידון נותר: %1$s שניות</string>
     <string name="quiz_time_text">⏳ זמן חידון: %1$d %1$s</string>
     <string name="answer_unlock_text">🔒 תשובות יפתחו בעוד %1$d שניות</string>
     <string name="scoreboard">לוח תוצאות</string>
     <string name="refresh">רענון</string>
     <string name="no_scores_yet">אין תוצאות עדייו...</string>
     <string name="points">נק׳</string>
+    <string name="lock_answer_text">🔒 נעילת תשובות</string>
+    <string name="quiz_time_text_2">זמן חידון: %1$s</string>
 </resources>

@@ -32,12 +32,11 @@ fun QuizFinishedAnimation(onAnimationEnd: () -> Unit) {
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset("times_up.json"))
     val progress by animateLottieCompositionAsState(composition, iterations = 1)
 
-    // Scale Animation for Text (Alternative, if you don't use Lottie)
     val scale = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
         scale.animateTo(1f, animationSpec = tween(800, easing = FastOutSlowInEasing))
-        delay(3000L) // Keep visible for 3 seconds
+        delay(3000L)
         onAnimationEnd()
     }
 
@@ -46,25 +45,25 @@ fun QuizFinishedAnimation(onAnimationEnd: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
-            visible = true, // Always visible, we control the content's animation
+            visible = true,
             enter = fadeIn(animationSpec = tween(800)),
             exit = fadeOut(animationSpec = tween(800))
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) { // Center text
-                if (composition != null) { // Check if Lottie composition is loaded
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (composition != null) {
                     LottieAnimation(
                         composition = composition,
                         progress = { progress },
-                        modifier = Modifier.fillMaxSize(0.7f) // Adjust size as needed
+                        modifier = Modifier.fillMaxSize(0.7f)
                     )
                 } else {
                     // Fallback text (if Lottie fails or as an alternative)
                     Text(
                         text = stringResource(R.string.times_up),
-                        style = MaterialTheme.typography.displayLarge, // Use a larger style
-                        color = MaterialTheme.colorScheme.error, // Use error color for impact
-                        fontSize = 48.sp, // Explicitly set a large font size
-                        modifier = Modifier.scale(scale.value) // Apply the scale animation
+                        style = MaterialTheme.typography.displayLarge,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 48.sp,
+                        modifier = Modifier.scale(scale.value)
                     )
                 }
             }
