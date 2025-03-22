@@ -26,7 +26,6 @@ import com.netanel.xplore.ui.theme.BackgroundLight
 import com.netanel.xplore.ui.theme.GradientEnd
 import com.netanel.xplore.ui.theme.GradientMid
 import com.netanel.xplore.ui.theme.GradientStart
-import com.netanel.xplore.ui.theme.OnSecondary
 
 @Composable
 fun QuizProgressBar(
@@ -83,7 +82,7 @@ fun QuizProgressBar(
             )
             Text(
                 text = "זמן חידון: $formattedTime",
-                style = MaterialTheme.typography.bodyLarge.copy(color = OnSecondary)
+                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
             )
         }
     }

@@ -19,7 +19,6 @@ import com.netanel.xplore.R
 import com.netanel.xplore.quiz.ui.QuizUIState
 import com.netanel.xplore.ui.theme.BackgroundLight
 import com.netanel.xplore.ui.theme.OnPrimary
-import com.netanel.xplore.ui.theme.OnSecondary
 
 @Composable
 fun QuestionCard(uiState: QuizUIState) {
@@ -43,7 +42,7 @@ fun QuestionCard(uiState: QuizUIState) {
             Text(
                 text = uiState.currentQuestion?.text.orEmpty(),
                 style = MaterialTheme.typography.bodyLarge,
-                color = OnSecondary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

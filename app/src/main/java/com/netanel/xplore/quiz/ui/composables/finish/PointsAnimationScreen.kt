@@ -33,8 +33,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.netanel.xplore.R
 import com.netanel.xplore.quiz.ui.QuizResult
 import com.netanel.xplore.ui.AnimatedComposable
+import com.netanel.xplore.ui.theme.Error
 import com.netanel.xplore.ui.theme.OnPrimary
-import com.netanel.xplore.ui.theme.OnSecondary
 
 @Composable
 fun PointsAnimationScreen(
@@ -104,7 +104,7 @@ fun PointsAnimationScreen(
                 },
                 style = MaterialTheme.typography.headlineLarge.copy( // Larger text
                     fontWeight = FontWeight.Bold,
-                    color = if (isCorrect) OnPrimary else OnSecondary,
+                    color = if (isCorrect) OnPrimary else Error,
                     textAlign = TextAlign.Center
                 ),
                 modifier = Modifier.scale(scale.value) // Apply the scale animation
