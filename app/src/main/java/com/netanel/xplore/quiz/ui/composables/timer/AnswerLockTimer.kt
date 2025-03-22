@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.netanel.xplore.ui.theme.GradientEnd
 import com.netanel.xplore.ui.theme.GradientStart
 import com.netanel.xplore.ui.theme.OnPrimary
-import com.netanel.xplore.ui.theme.OnSecondary
+
 
 @Composable
 fun AnswerLockTimer(timeLeft: Long, totalTime: Long) {
@@ -50,7 +50,7 @@ fun AnswerLockTimer(timeLeft: Long, totalTime: Long) {
             modifier = Modifier
                 .size(70.dp)
                 .clip(CircleShape)
-                .background(OnSecondary.copy(alpha = 0.15f))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f))
         ) {
             Canvas(modifier = Modifier.size(70.dp)) {
                 drawArc(
