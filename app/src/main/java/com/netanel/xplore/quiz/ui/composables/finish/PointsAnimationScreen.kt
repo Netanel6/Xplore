@@ -115,7 +115,7 @@ fun PointsAnimationScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = stringResource(R.string.explanation),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
