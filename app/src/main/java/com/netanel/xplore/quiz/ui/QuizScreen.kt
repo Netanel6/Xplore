@@ -33,62 +33,53 @@ fun QuizScreen(
     viewModel: QuizViewModel = hiltViewModel(),
     onGoHome: () -> Unit
 ) {
-    // Load the quiz when the composable is first launched
     LaunchedEffect(quiz) {
         viewModel.loadQuiz(quiz)
     }
 
-    // Collect the state from the ViewModel
     val quizState by viewModel.quizState.collectAsState()
     val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
 
-    // UI state variables
     var showPointsAnimation by remember { mutableStateOf(false) }
     var quizCompleted by remember { mutableStateOf(false) }
     var showQuizFinishedAnimation by remember { mutableStateOf(false) }
 
-    // Initialize the timer manager once
     val timerManager = remember { QuizTimerManager(quiz.quizTimer) }
 
-    // Collect timer states
     val totalTimeLeft by timerManager.totalTimeLeft.collectAsState()
     val answerLockTimeLeft by timerManager.answerLockTimeLeft.collectAsState()
 
-    // Get the current question
     val currentQuestion =
         (quizState as? QuizState.Loaded)?.quiz?.questions?.getOrNull(currentQuestionIndex)
 
-    // Track viewed questions
     val viewedQuestions = remember { mutableSetOf<Int>() }
     var isFirstView by remember { mutableStateOf(false) }
 
-    // Set the quiz finished listener once
     LaunchedEffect(Unit) {
         timerManager.setOnQuizFinishedListener {
             showQuizFinishedAnimation = true
         }
     }
 
-    // Start the quiz timer when the quiz is loaded
     LaunchedEffect(quizState) {
         if (quizState is QuizState.Loaded) {
             timerManager.startQuizTimer()
         }
     }
 
-    // Handle question viewing and answer lock timer
-    LaunchedEffect(currentQuestionIndex) {
-        isFirstView = viewedQuestions.add(currentQuestionIndex)
-        if (isFirstView && currentQuestion?.isAnswered == false) {
-            timerManager.startAnswerLockTimer(quiz.answerLockTimer) {
-                // Actions to perform when the answer lock timer ends
-            }
+    LaunchedEffect(currentQuestionIndex, quizState) {
+        val shouldStartTimer =
+            currentQuestion?.isAnswered == false && !viewedQuestions.contains(currentQuestionIndex)
+        isFirstView = shouldStartTimer
+
+        if (shouldStartTimer) {
+            viewedQuestions.add(currentQuestionIndex)
+            timerManager.startAnswerLockTimer(quiz.answerLockTimer) {}
         } else {
             timerManager.stopAnswerLockTimer()
         }
     }
 
-    // Check if the quiz is completed
     LaunchedEffect(totalTimeLeft, currentQuestionIndex) {
         val loadedQuiz = (quizState as? QuizState.Loaded)?.quiz ?: return@LaunchedEffect
         val allAnswered = loadedQuiz.questions.all { it.isAnswered }
@@ -100,7 +91,6 @@ fun QuizScreen(
         }
     }
 
-    // Prepare the UI state
     val uiState = QuizUIState(
         currentQuestion = currentQuestion,
         currentQuestionNumber = currentQuestionIndex + 1,
@@ -117,7 +107,6 @@ fun QuizScreen(
         isFirstView = isFirstView
     )
 
-    // UI layout
     Column(
         modifier = Modifier
             .fillMaxSize()

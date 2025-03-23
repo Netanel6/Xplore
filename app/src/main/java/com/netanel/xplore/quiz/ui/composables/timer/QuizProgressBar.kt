@@ -31,8 +31,8 @@ import com.netanel.xplore.ui.theme.GradientStart
 
 @Composable
 fun QuizProgressBar(
-    quizProgress: Float,  // Progress value (0.0 - 1.0)
-    formattedTime: String  // Displayed time text
+    quizProgress: Float,
+    formattedTime: String
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = quizProgress,
@@ -45,7 +45,6 @@ fun QuizProgressBar(
         verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        // 🟣 Stylish Progress Bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,7 +61,6 @@ fun QuizProgressBar(
                 )
             )
 
-            // 🔵 Animated Gradient Progress Fill
             Box(
                 modifier = Modifier
                     .fillMaxWidth(animatedProgress)
@@ -72,7 +70,6 @@ fun QuizProgressBar(
             )
         }
 
-        // ⏳ Time & Progress Text
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
