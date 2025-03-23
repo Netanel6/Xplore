@@ -13,11 +13,11 @@ data class Quiz(
     val isActive: Boolean = true,
     val totalScore: Int = 0,
     val currentScore: Int = 0,
-    var scoreBoard: ScoreBoard
+    var scoreBoard: ScoreBoard?
 ) {
 
     @Serializable
-    data class ScoreBoard(val scores: List<Score>) {
+    data class ScoreBoard(val scores: List<Score>?) {
         @Serializable
         data class Score(val id: String = "", val userName: String = "", val score: Int = 0)
     }
