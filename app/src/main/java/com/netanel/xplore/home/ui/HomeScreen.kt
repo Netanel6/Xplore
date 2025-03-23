@@ -93,7 +93,7 @@ fun HomeScreen(
                 contentScale = ContentScale.Crop
             )
         }
-        // Place QuestionMarkBackground here, so it's behind everything
+
         QuestionMarkBackground()
 
         Column(
