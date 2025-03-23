@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,8 +68,9 @@ fun HomeScreen(
         isUiVisible = true
     }
 
-    val bgLottieComposition by rememberLottieComposition(LottieCompositionSpec.Asset("home_bg.json"))
-    val mainLottieComposition by rememberLottieComposition(LottieCompositionSpec.Asset("home_animation.json"))
+
+    val bgLottieComposition by rememberLottieComposition(LottieCompositionSpec.Asset("home_bg.json")) // Replace with your actual animation
+    val mainLottieComposition by rememberLottieComposition(LottieCompositionSpec.Asset("home_animation.json")) //REPLACE
 
     val gradientBackground = Brush.verticalGradient(
         colors = listOf(
@@ -83,6 +84,7 @@ fun HomeScreen(
             .fillMaxSize()
             .background(gradientBackground)
     ) {
+
         bgLottieComposition?.let {
             LottieAnimation(
                 composition = it,
@@ -91,7 +93,10 @@ fun HomeScreen(
                 contentScale = ContentScale.Crop
             )
         }
+
         QuestionMarkBackground()
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -109,40 +114,48 @@ fun HomeScreen(
                     text = stringResource(R.string.welcome_back, username),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(top = 48.dp, bottom = 16.dp),
                     textAlign = TextAlign.Center
                 )
             }
 
-
             Spacer(modifier = Modifier.height(48.dp))
 
-            mainLottieComposition?.let {
-                AnimatedVisibility(visible = !showQuizList, content = {
+
+            Box(
+                modifier = Modifier
+                    .height(260.dp)
+                    .width(260.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                mainLottieComposition?.let {
                     LottieAnimation(
                         composition = it,
                         iterations = 1,
-                        modifier = Modifier
-                            .height(260.dp)
-                            .width(260.dp)
+                        modifier = Modifier.fillMaxSize()
                     )
-                })
+                }
+
             }
 
-            val density2 = LocalDensity.current
+            Spacer(modifier = Modifier.height(48.dp))
+
+
+            val density = LocalDensity.current
             AnimatedVisibility(
                 visible = showQuizList,
                 enter = slideInVertically(animationSpec = tween(durationMillis = 700)) {
-                    with(density2) { -100.dp.roundToPx() }
+
+                    with(density) { -100.dp.roundToPx() }  // Start above
                 } + fadeIn(animationSpec = tween(700)),
                 exit = slideOutVertically(animationSpec = tween(durationMillis = 700)) {
-                    with(density2) { -100.dp.roundToPx() }
+
+                    with(density) { -100.dp.roundToPx() }   // Exit above
                 } + fadeOut(animationSpec = tween(700)),
                 modifier = Modifier.fillMaxWidth()
 
             ) {
-
                 QuizList(
                     userId = userId,
                     quizzes = quizList.orEmpty(),
@@ -156,18 +169,14 @@ fun HomeScreen(
                 )
             }
 
-
-            val density = LocalDensity.current
             AnimatedVisibility(
                 visible = !showQuizList,
-                enter = fadeIn(animationSpec = tween(durationMillis = 700)) +
-                        slideInVertically(animationSpec = tween(durationMillis = 700)) {
-                            with(density) { 100.dp.roundToPx() }
-                        },
-                exit = fadeOut(animationSpec = tween(durationMillis = 700)) +
-                        slideOutVertically(animationSpec = tween(durationMillis = 700)) {
-                            with(density) { 100.dp.roundToPx() }
-                        }
+                enter = slideInVertically(animationSpec = tween(durationMillis = 700)) {
+                    with(density) { 100.dp.roundToPx() }
+                } + fadeIn(animationSpec = tween(700)),
+                exit = slideOutVertically(animationSpec = tween(durationMillis = 700)) {
+                    with(density) { 100.dp.roundToPx() }
+                } + fadeOut(animationSpec = tween(700))
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -175,28 +184,30 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Select Quiz Button
-                    OutlinedButton(
+                    Button(
                         onClick = { showQuizList = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            contentColor = MaterialTheme.colorScheme.onSecondary
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text(stringResource(R.string.select_quiz), fontSize = 18.sp)
                     }
 
                     // Logout Button
-                    OutlinedButton(
+                    Button(
                         onClick = { onLogoutClicked() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            contentColor = MaterialTheme.colorScheme.onSecondary
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text(stringResource(R.string.logout), fontSize = 18.sp)
