@@ -111,14 +111,6 @@ class QuizViewModel @Inject constructor(
             try {
                 val quizId = currentQuiz?._id ?: return@launch
                 val fetchedQuiz = quizRepository.getQuiz(quizId)
-                val resetQuestions = fetchedQuiz.questions.map {
-                    it.copy(
-                        userSelectedAnswer = null,
-                        isAnswered = false,
-                        points = 0
-                    )
-                }
-
                 currentQuiz = fetchedQuiz
                 _currentQuestionIndex.value = 0
                 _quizResult.value = null
@@ -150,13 +142,6 @@ class QuizViewModel @Inject constructor(
         }
     }
 }
-
-data class AnimationData(
-    val points: Int,
-    val isCorrect: Boolean,
-    val correctAnswer: String
-)
-
 
 data class QuizResult(
     val totalScore: Int,

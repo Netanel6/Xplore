@@ -53,4 +53,9 @@
     <string name="points">נק׳</string>
     <string name="lock_answer_text">🔒 נעילת תשובות</string>
     <string name="quiz_time_text_2">זמן חידון: %1$s</string>
+    <string name="easy">קל</string>
+    <string name="medium">בינוני</string>
+    <string name="hard">קשה</string>
+    <string name="difficulty">קושי:</string>
+    <string name="error_loading_quiz">שגיאה בטעינת חידון</string>
 </resources>
