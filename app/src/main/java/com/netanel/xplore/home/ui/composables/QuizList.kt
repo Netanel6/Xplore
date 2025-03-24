@@ -212,7 +212,7 @@ fun QuizListItem(userId: String, quiz: Quiz, onClick: () -> Unit, backgroundColo
                         Text(
                             text = stringResource(
                                 R.string.final_score,
-                                quiz.scoreBoard.scores.find { it.id == userId }?.score ?: 0
+                                quiz.scoreBoard?.scores?.find { it.id == userId }?.score ?: 0
                             ),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.secondary

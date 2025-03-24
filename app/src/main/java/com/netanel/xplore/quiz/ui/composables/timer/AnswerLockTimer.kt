@@ -23,11 +23,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.netanel.xplore.R
 import com.netanel.xplore.ui.theme.GradientEnd
 import com.netanel.xplore.ui.theme.GradientStart
-import com.netanel.xplore.ui.theme.OnPrimary
 
 
 @Composable
@@ -75,12 +76,12 @@ fun AnswerLockTimer(timeLeft: Long, totalTime: Long) {
                 Text(
                     text = formattedTime,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    color = OnPrimary
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
         Text(
-            text = "🔒 נעילת תשובות",
+            text = stringResource(R.string.lock_answer_text),
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
             color = MaterialTheme.colorScheme.onSurface
         )
