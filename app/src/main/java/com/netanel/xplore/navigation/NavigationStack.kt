@@ -4,12 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.netanel.xplore.R
 import com.netanel.xplore.auth.ui.AuthScreen
 import com.netanel.xplore.home.ui.HomeScreen
 import com.netanel.xplore.home.ui.HomeViewModel
@@ -101,7 +103,7 @@ fun NavigationStack(
                     quiz = quiz,
                     onGoHome = { navController.popBackStack() }
                 )
-            } ?: QuizErrorScreen("Couldn't find a valid quiz")
+            } ?: QuizErrorScreen(stringResource(R.string.error_loading_quiz))
         }
     }
 

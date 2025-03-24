@@ -110,24 +110,17 @@ class QuizViewModel @Inject constructor(
             _quizState.value = QuizState.Loading
             try {
                 val quizId = currentQuiz?._id ?: return@launch
-                val freshQuiz = quizRepository.getQuiz(quizId).copy(
-                    questions = quizRepository.getQuiz(quizId).questions.map {
-                        it.copy(
-                        userSelectedAnswer = null,
-                        isAnswered = false,
-                        points = 0
-                    ) }
-                )
-
-                currentQuiz = freshQuiz
+                val fetchedQuiz = quizRepository.getQuiz(quizId)
+                currentQuiz = fetchedQuiz
                 _currentQuestionIndex.value = 0
                 _quizResult.value = null
-                _quizState.value = QuizState.Loaded(freshQuiz)
+                _quizState.value = QuizState.Loaded(fetchedQuiz)
             } catch (e: Exception) {
                 _quizState.value = QuizState.Error("Failed to reset quiz: ${e.message}")
             }
         }
     }
+
 
     fun updateQuiz() {
         val userId = sharedPreferencesManager.getString(USER_ID, "")
@@ -136,6 +129,7 @@ class QuizViewModel @Inject constructor(
             currentQuiz?._id?.let { quizRepository.updateQuiz(it, updateScoreRequest) }
         }
     }
+
     fun fetchQuizById(quizId: String) {
         viewModelScope.launch {
             try {
@@ -148,13 +142,6 @@ class QuizViewModel @Inject constructor(
         }
     }
 }
-
-data class AnimationData(
-    val points: Int,
-    val isCorrect: Boolean,
-    val correctAnswer: String
-)
-
 
 data class QuizResult(
     val totalScore: Int,

@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.netanel.xplore.R
 import com.netanel.xplore.ui.theme.BackgroundLight
 import com.netanel.xplore.ui.theme.GradientEnd
 import com.netanel.xplore.ui.theme.GradientMid
@@ -29,8 +31,8 @@ import com.netanel.xplore.ui.theme.GradientStart
 
 @Composable
 fun QuizProgressBar(
-    quizProgress: Float,  // Progress value (0.0 - 1.0)
-    formattedTime: String  // Displayed time text
+    quizProgress: Float,
+    formattedTime: String
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = quizProgress,
@@ -43,7 +45,6 @@ fun QuizProgressBar(
         verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        // 🟣 Stylish Progress Bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,7 +61,6 @@ fun QuizProgressBar(
                 )
             )
 
-            // 🔵 Animated Gradient Progress Fill
             Box(
                 modifier = Modifier
                     .fillMaxWidth(animatedProgress)
@@ -70,7 +70,6 @@ fun QuizProgressBar(
             )
         }
 
-        // ⏳ Time & Progress Text
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -81,7 +80,7 @@ fun QuizProgressBar(
                 tint = GradientMid
             )
             Text(
-                text = "זמן חידון: $formattedTime",
+                text = stringResource(R.string.quiz_time_text_2, formattedTime),
                 style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
             )
         }

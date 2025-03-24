@@ -54,10 +54,6 @@ fun MainTopAppBar() {
                     .background(OnPrimary),
                 contentAlignment = Alignment.Center
             ) {
-
-                // Question Mark Background (Multiple, Shuffled)
-                QuestionMarkBackground()
-
                 // App Name (Sliding Text)
                 Text(
                     text = stringResource(R.string.app_name),
