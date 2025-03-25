@@ -41,7 +41,9 @@ fun QuizProgressIndicators(
 
         QuizProgressBar(quizProgress, formattedTime)
 
-        AnswerLockTimer(answerLockTimeLeft, safeLockTime)
+        if (answerLockTimeLeft != 0L) {
+            AnswerLockTimer(answerLockTimeLeft, safeLockTime)
+        }
     }
 }
 
