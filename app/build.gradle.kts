@@ -26,8 +26,8 @@ android {
         applicationId = "com.netanel.xplore"
         minSdk = 26
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.0.3"
+        versionCode = 5
+        versionName = "1.0.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -104,6 +104,7 @@ dependencies {
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
+    implementation(libs.androidx.databinding.compiler)
     kapt(libs.hilt.android.compiler)
 
     // Hilt Navigation for Compose
