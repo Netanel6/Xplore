@@ -45,6 +45,7 @@ room = "2.6.1"
 # Confetti
 konfetti = "2.0.2"
 compose-material-icons-extended = "1.7.8"
+databindingCompiler = "8.10.0"
 
 
 [libraries]
@@ -107,6 +108,7 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
 # Confetti
 konfetti-compose = { module = "nl.dionsegijn:konfetti-compose", version.ref = "konfetti" }
+androidx-databinding-compiler = { group = "androidx.databinding", name = "databinding-compiler", version.ref = "databindingCompiler" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
