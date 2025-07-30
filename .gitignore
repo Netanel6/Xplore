@@ -26,3 +26,5 @@ gradle/wrapper/gradle-wrapper.properties
 keystore.properties
 keys/xplore signed apk info .rtf
 keys/XploreKey
+.idea/kotlinc.xml
+.idea/deploymentTargetSelector.xml
