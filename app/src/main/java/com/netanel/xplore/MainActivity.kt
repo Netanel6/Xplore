@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.netanel.xplore.localDatabase.user.viewModel.UserViewModel
 import com.netanel.xplore.navigation.NavigationStack
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
         val configuration = Configuration(resources.configuration)
         configuration.setLayoutDirection(Locale(getString(R.string.he_lang)))
         resources.updateConfiguration(configuration, resources.displayMetrics)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         enableEdgeToEdge()
         setContent {
