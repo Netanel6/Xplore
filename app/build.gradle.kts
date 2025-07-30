@@ -12,22 +12,23 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
-    id("kotlin-kapt")
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.firebaseCrashlytics)
+    id("com.google.devtools.ksp")
+
 }
 
 android {
     namespace = "com.netanel.xplore"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.netanel.xplore"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 5
-        versionName = "1.0.4"
+        minSdk = 30
+        targetSdk = 35
+        versionCode = 6
+        versionName = "1.0.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -75,6 +76,12 @@ android {
         disable += listOf("StateFlowValueCalledInComposition", "NotificationPermission")
         checkDependencies = true
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/NOTICE.md"
+        }
+    }
 }
 
 dependencies {
@@ -105,7 +112,7 @@ dependencies {
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
     implementation(libs.androidx.databinding.compiler)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     // Hilt Navigation for Compose
     implementation(libs.hilt.navigation.compose)
@@ -118,7 +125,7 @@ dependencies {
 
     // Glide for image loading
     implementation(libs.glide)
-    kapt(libs.glide.compiler)
+    ksp(libs.glide.compiler)
 
     // Retrofit + OKHttp for Networking
     implementation(libs.retrofit)
@@ -128,7 +135,7 @@ dependencies {
 
     // Room Database (Newly Added)
     implementation(libs.room.runtime)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 
     // Confetti
